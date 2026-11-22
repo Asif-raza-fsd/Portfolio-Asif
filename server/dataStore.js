@@ -121,7 +121,7 @@ const defaultData = {
     },
   ],
   settings: {
-    heroIntro: 'Hi I am',
+    heroIntro: '',
     heroName: 'Asif Raza',
     heroTitle: 'Video Editor & Colorist',
     heroPortraitUrl: 'assets/images/hero-portrait.png',
@@ -132,13 +132,10 @@ const defaultData = {
     happyClients: '20+',
     socialLinks: {
       instagram: 'https://instagram.com',
-      youtube: 'https://youtube.com',
-      linkedin: 'https://linkedin.com',
-      behance: 'https://behance.net',
     },
-    contactEmail: 'asif.raza.editor@gmail.com',
-    contactPhone: '+91 98765 43210',
-    location: 'Available Worldwide (Remote / On-site)',
+    contactEmail: 'asif.r2108@gmail.com',
+    contactPhone: '+918707312326',
+    location: '',
   },
   inquiries: [
     {

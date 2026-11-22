@@ -157,9 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderSettings(settings) {
-    if (settings.heroIntro && heroIntro) heroIntro.textContent = settings.heroIntro;
-    if (settings.heroName && heroName) heroName.textContent = settings.heroName;
-    if (settings.heroTitle && heroTitle) heroTitle.textContent = settings.heroTitle;
+    if (heroName) heroName.textContent = settings.heroName || 'Asif Raza';
+    if (heroTitle) heroTitle.textContent = settings.heroTitle || 'Video Editor & Colorist';
     if (settings.heroBio && aboutBio) aboutBio.textContent = settings.heroBio;
 
     // Stats
@@ -167,31 +166,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (statProjects) statProjects.textContent = settings.projectsDone || '50+';
     if (statClients) statClients.textContent = settings.happyClients || '20+';
 
-    // CV Download Link
-    if (settings.cvUrl && downloadCvBtn) {
-      downloadCvBtn.href = settings.cvUrl;
-    }
-
     // Portrait Image
     if (settings.heroPortraitUrl && heroPortraitImg) {
       heroPortraitImg.src = settings.heroPortraitUrl;
     }
 
-    // Socials
-    if (settings.socialLinks) {
-      if (settings.socialLinks.instagram && socialInstagram) socialInstagram.href = settings.socialLinks.instagram;
-      if (settings.socialLinks.youtube && socialYoutube) socialYoutube.href = settings.socialLinks.youtube;
-      if (settings.socialLinks.linkedin && socialLinkedin) socialLinkedin.href = settings.socialLinks.linkedin;
-      if (settings.socialLinks.behance && socialBehance) socialBehance.href = settings.socialLinks.behance;
+    // Socials - Instagram
+    if (settings.socialLinks && settings.socialLinks.instagram && socialInstagram) {
+      socialInstagram.href = settings.socialLinks.instagram;
     }
 
     // Contact info
-    if (settings.contactEmail) {
-      if (contactEmailLink) contactEmailLink.href = `mailto:${settings.contactEmail}`;
-      if (contactEmailText) contactEmailText.textContent = settings.contactEmail;
+    const email = settings.contactEmail || 'asif.r2108@gmail.com';
+    if (contactEmailLink) contactEmailLink.href = `mailto:${email}`;
+    if (contactEmailText) contactEmailText.textContent = email;
+
+    const phone = settings.contactPhone || '+918707312326';
+    if (contactPhoneText) {
+      contactPhoneText.textContent = phone;
+      const phoneParentLink = contactPhoneText.closest('a');
+      if (phoneParentLink) phoneParentLink.href = `tel:${phone.replace(/\s+/g, '')}`;
     }
-    if (settings.contactPhone && contactPhoneText) contactPhoneText.textContent = settings.contactPhone;
-    if (settings.location && contactLocationText) contactLocationText.textContent = settings.location;
   }
 
   /* ==========================================================================

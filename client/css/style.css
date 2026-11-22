@@ -4,29 +4,31 @@
    ========================================================================== */
 
 :root {
-  /* Color Palette */
-  --bg-primary: #121212;
-  --bg-card: #1B1B1B;
-  --bg-card-alt: #1E1E1E;
-  --bg-card-hover: #242424;
-  --bg-circle-backdrop: #1A1A1A;
+  /* Color Palette — Premium Cinema Obsidian & Studio Charcoal */
+  --bg-primary: #0D0E12;
+  --bg-card: #15171F;
+  --bg-card-alt: #1A1D27;
+  --bg-card-hover: #1F232F;
+  --bg-circle-backdrop: #13151D;
 
-  /* Orange Accent & Gradients */
-  --accent-orange: #FD6F00;
-  --accent-orange-dark: #E46400;
-  --accent-gradient: linear-gradient(90deg, #FD6F00 0%, #E46400 100%);
-  --accent-gradient-hover: linear-gradient(90deg, #FF7E1D 0%, #F5710D 100%);
-  --accent-glow: rgba(253, 111, 0, 0.35);
+  /* Orange Accent & Gradients — Warm Cinematic Amber */
+  --accent-orange: #FF7020;
+  --accent-orange-dark: #E65100;
+  --accent-gradient: linear-gradient(135deg, #FF7B29 0%, #EA580C 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #FF8D42 0%, #F97316 100%);
+  --accent-glow: rgba(255, 112, 32, 0.22);
+  --accent-subtle: rgba(255, 112, 32, 0.08);
 
-  /* Typography Colors */
-  --text-primary: #FAFAFA;
-  --text-secondary: #959595;
-  --text-muted: #707070;
+  /* Typography Colors — Crisp, Soothing & High Legibility */
+  --text-primary: #F8F9FA;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
 
   /* Borders & Dividers */
-  --border-subtle: #2A2A2A;
+  --border-subtle: rgba(255, 255, 255, 0.07);
   --border-light: rgba(255, 255, 255, 0.12);
   --border-card: rgba(255, 255, 255, 0.08);
+  --border-card-hover: rgba(255, 112, 32, 0.35);
 
   /* Fonts */
   --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -353,11 +355,12 @@ img, svg {
 
 .hero-name {
   font-family: var(--font-heading);
-  font-size: 2.1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #D6D6D6;
-  margin-bottom: 8px;
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  margin-bottom: 6px;
+  line-height: 1.15;
 }
 
 .hero-title {
@@ -510,6 +513,19 @@ img, svg {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
+}
+
+.services-grid.services-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 960px;
+  margin: 0 auto;
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .services-grid.services-grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .service-card {
@@ -1084,7 +1100,7 @@ img, svg {
 .contact-section {
   padding: 100px 0;
   border-top: 1px solid var(--border-subtle);
-  background: #111111;
+  background: var(--bg-primary);
 }
 
 .contact-grid {
