@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+  <defs>
+    <radialGradient id="rimGlow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#FD6F00" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#FD6F00" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#222222"/>
+      <stop offset="50%" stop-color="#141414"/>
+      <stop offset="100%" stop-color="#0A0A0A"/>
+    </linearGradient>
+    <linearGradient id="skinTone" x1="30%" y1="0%" x2="70%" y2="100%">
+      <stop offset="0%" stop-color="#E2D1C3"/>
+      <stop offset="50%" stop-color="#C7B2A2"/>
+      <stop offset="100%" stop-color="#8C7667"/>
+    </linearGradient>
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D2B2A"/>
+      <stop offset="100%" stop-color="#151414"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ambient Rim Backlight -->
+  <circle cx="300" cy="350" r="280" fill="url(#rimGlow)" />
+
+  <!-- Person Cutout Silhouette & Details -->
+  <g id="body">
+    <!-- Suit Body -->
+    <path d="M120 700 C 130 540, 180 430, 240 400 L 360 400 C 420 430, 470 540, 480 700 Z" fill="url(#suitGrad)"/>
+    <!-- Suit Lapels & Inner Shirt -->
+    <path d="M260 400 L 300 520 L 340 400 Z" fill="#0D0D0D"/>
+    <!-- Black Shirt / Inner Collar -->
+    <polygon points="280,400 320,400 300,470" fill="#181818" stroke="#262626" stroke-width="2"/>
+    <path d="M240 400 L 285 550 L 245 565 L 205 440 Z" fill="#1C1C1C" stroke="#2C2C2C" stroke-width="1.5"/>
+    <path d="M360 400 L 315 550 L 355 565 L 395 440 Z" fill="#1C1C1C" stroke="#2C2C2C" stroke-width="1.5"/>
+    
+    <!-- Left Hand / Watch gesture -->
+    <path d="M370 510 C 390 530, 410 550, 405 580 C 400 610, 370 600, 360 580 Z" fill="url(#skinTone)"/>
+    <rect x="365" y="555" width="28" height="12" rx="4" fill="#E46400" opacity="0.8"/>
+  </g>
+
+  <!-- Neck -->
+  <path d="M275 340 L 325 340 L 320 410 L 280 410 Z" fill="url(#skinTone)"/>
+  <path d="M280 375 L 320 375 L 300 405 Z" fill="#9F897B" opacity="0.4"/>
+
+  <!-- Head & Face -->
+  <g id="head">
+    <!-- Face shape -->
+    <path d="M265 240 C 265 190, 335 190, 335 240 C 335 285, 330 330, 300 345 C 270 330, 265 285, 265 240 Z" fill="url(#skinTone)"/>
+    
+    <!-- Hair & Beard (Clean modern fade) -->
+    <path d="M260 220 C 260 170, 275 145, 305 145 C 335 145, 345 175, 342 220 C 335 195, 320 180, 300 180 C 280 180, 268 198, 260 220 Z" fill="url(#hairGrad)"/>
+    <!-- Well groomed beard & mustache -->
+    <path d="M272 280 C 285 282, 315 282, 328 280 C 332 305, 325 338, 300 344 C 275 338, 268 305, 272 280 Z" fill="#1E1C1B" opacity="0.9"/>
+    
+    <!-- Eyes, Eyebrows & Glasses/Nose -->
+    <path d="M275 228 C 282 225, 290 226, 294 230" stroke="#151414" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M306 230 C 310 226, 318 225, 325 228" stroke="#151414" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <circle cx="285" cy="238" r="4" fill="#1B1B1B"/>
+    <circle cx="315" cy="238" r="4" fill="#1B1B1B"/>
+    <circle cx="286" cy="237" r="1.2" fill="#FFFFFF"/>
+    <circle cx="316" cy="237" r="1.2" fill="#FFFFFF"/>
+    
+    <!-- Nose line -->
+    <path d="M300 236 L 297 265 L 305 268" stroke="#7E685B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    
+    <!-- Lips -->
+    <path d="M292 290 Q 300 293 308 290" stroke="#7A564C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

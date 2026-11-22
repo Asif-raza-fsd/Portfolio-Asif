@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="logDesert" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6F706E"/>
+      <stop offset="60%" stop-color="#84837D"/>
+      <stop offset="100%" stop-color="#72706A"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#logDesert)"/>
+  <circle cx="400" cy="200" r="70" fill="#999890" opacity="0.6"/>
+  <path d="M0 340 Q 200 300 400 350 T 800 330 L 800 500 L 0 500 Z" fill="#696761"/>
+  <path d="M0 380 Q 250 340 500 390 T 800 370 L 800 500 L 0 500 Z" fill="#585651"/>
+  <text x="40" y="60" fill="#A5A49D" font-family="sans-serif" font-size="22" font-weight="700">ARRI LogC3 (RAW Footage)</text>
+  <text x="40" y="90" fill="#888781" font-family="sans-serif" font-size="14">Unprocessed Sensor Tone Curve • Zero Saturation Boost</text>
+</svg>

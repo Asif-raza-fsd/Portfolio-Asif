@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Asif Raza Portfolio</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23FD6F00'/><text x='50' y='64' font-size='42' font-family='sans-serif' font-weight='900' fill='white' text-anchor='middle'>AR</text></svg>">
+</head>
+<body class="admin-body">
+
+  <!-- =======================================================================
+       LOGIN SCREEN (Displayed when unauthenticated)
+       ======================================================================= -->
+  <div class="login-wrapper" id="loginScreen">
+    <div class="login-card">
+      <div class="login-header">
+        <a href="index.html" class="logo">
+          <span>ASIF RAZA</span>
+          <div class="logo-dot"></div>
+        </a>
+        <h2 class="login-title">Portfolio Admin Portal</h2>
+        <p class="login-subtitle">Sign in to manage projects, color grading comparisons, hero stats, and client inquiries.</p>
+      </div>
+
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label for="loginEmail" class="form-label">Admin Email</label>
+          <input type="email" id="loginEmail" class="form-control" placeholder="admin@asifraza.com" value="admin@asifraza.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword" class="form-label">Password</label>
+          <input type="password" id="loginPassword" class="form-control" placeholder="Enter admin password" value="admin123456" required>
+          <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:6px;">Default dev credentials: admin@asifraza.com / admin123456</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;" id="loginSubmitBtn">
+          <span>Authenticate & Access Dashboard</span>
+        </button>
+      </form>
+
+      <div style="text-align:center; margin-top:20px;">
+        <a href="index.html" style="color:var(--text-secondary); font-size:0.85rem;">&larr; Back to Public Portfolio</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       ADMIN DASHBOARD APP (Displayed when authenticated)
+       ======================================================================= -->
+  <div class="admin-layout" id="adminApp" style="display:none;">
+    <!-- Top Header -->
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <a href="index.html" class="logo">
+          <span>ASIF RAZA</span>
+          <div class="logo-dot"></div>
+        </a>
+        <span class="admin-badge">Admin Dashboard</span>
+      </div>
+
+      <div class="admin-header-right">
+        <a href="index.html" target="_blank" class="btn btn-outline" style="padding:7px 16px; font-size:0.82rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          View Live Site
+        </a>
+        <button class="btn btn-outline" id="logoutBtn" style="padding:7px 16px; font-size:0.82rem; border-color:#e74c3c; color:#e74c3c;">
+          Log Out
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="admin-tabs-nav container">
+      <button class="admin-tab active" data-tab="tab-overview">Overview</button>
+      <button class="admin-tab" data-tab="tab-projects">Portfolio Projects</button>
+      <button class="admin-tab" data-tab="tab-color">Color Grading</button>
+      <button class="admin-tab" data-tab="tab-settings">Hero & Site Settings</button>
+      <button class="admin-tab" data-tab="tab-inquiries">Client Inquiries <span class="inquiry-counter-badge" id="inquiryBadge">0</span></button>
+    </nav>
+
+    <!-- Main Tab Content Area -->
+    <main class="container admin-content">
+
+      <!-- ================= TAB 1: OVERVIEW ================= -->
+      <section class="admin-tab-pane active" id="tab-overview">
+        <h2 class="admin-pane-title">Dashboard Overview</h2>
+        
+        <div class="overview-stats-grid">
+          <div class="overview-stat-card">
+            <div class="ov-label">Total Projects</div>
+            <div class="ov-value" id="ovTotalProjects">0</div>
+            <div class="ov-desc">Active in portfolio showcase</div>
+          </div>
+          <div class="overview-stat-card">
+            <div class="ov-label">Color Comparisons</div>
+            <div class="ov-value" id="ovTotalGrades">0</div>
+            <div class="ov-desc">Interactive before/after sliders</div>
+          </div>
+          <div class="overview-stat-card">
+            <div class="ov-label">Client Inquiries</div>
+            <div class="ov-value" id="ovTotalInquiries">0</div>
+            <div class="ov-desc">Received via contact form</div>
+          </div>
+          <div class="overview-stat-card highlight">
+            <div class="ov-label">New / Pending</div>
+            <div class="ov-value" id="ovUnreadInquiries">0</div>
+            <div class="ov-desc">Awaiting your response</div>
+          </div>
+        </div>
+
+        <div class="overview-quick-actions">
+          <button class="btn btn-primary" onclick="window.switchTab('tab-projects'); window.openProjectModal();">
+            + Add New Video Project
+          </button>
+          <button class="btn btn-outline" onclick="window.switchTab('tab-color'); window.openColorGradeModal();">
+            + Add Color Grade Comparison
+          </button>
+          <button class="btn btn-outline" onclick="window.switchTab('tab-settings');">
+            Update Hero Stats & Bio
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= TAB 2: PROJECTS ================= -->
+      <section class="admin-tab-pane" id="tab-projects">
+        <div class="pane-action-header">
+          <div>
+            <h2 class="admin-pane-title">Video Projects</h2>
+            <p class="admin-pane-desc">Manage video edits, reels, documentary long-forms, and commercial projects.</p>
+          </div>
+          <button class="btn btn-primary" onclick="window.openProjectModal()">+ Add New Project</button>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Thumbnail</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Metric / Highlight</th>
+                <th>Featured</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="projectsTableBody">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= TAB 3: COLOR GRADING ================= -->
+      <section class="admin-tab-pane" id="tab-color">
+        <div class="pane-action-header">
+          <div>
+            <h2 class="admin-pane-title">Before & After Color Grading Comparisons</h2>
+            <p class="admin-pane-desc">Showcase RAW/LOG camera data against your final DaVinci Resolve color grade.</p>
+          </div>
+          <button class="btn btn-primary" onclick="window.openColorGradeModal()">+ Add New Comparison</button>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Comparison Title</th>
+                <th>Camera & Sensor</th>
+                <th>Color Space</th>
+                <th>Before (RAW)</th>
+                <th>After (Graded)</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="colorGradesTableBody">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: SETTINGS ================= -->
+      <section class="admin-tab-pane" id="tab-settings">
+        <h2 class="admin-pane-title">Hero Stats & Site Settings</h2>
+        <p class="admin-pane-desc">Update hero text, metrics, download links, portrait image, and contact channels in real time.</p>
+
+        <form id="settingsForm" class="admin-settings-form">
+          <h3 class="form-sub-heading">Hero Display & Typography</h3>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Intro Text</label>
+              <input type="text" id="settingHeroIntro" class="form-control" placeholder="Hi I am">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="settingHeroName" class="form-control" placeholder="Asif Raza">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Hero Title (Orange Gradient Text)</label>
+            <input type="text" id="settingHeroTitle" class="form-control" placeholder="Video Editor & Colorist">
+          </div>
+
+          <h3 class="form-sub-heading">Dynamic Hero Stats Card (Separated by Dividers)</h3>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Experience Stat</label>
+              <input type="text" id="settingExp" class="form-control" placeholder="2+">
+              <small style="color:var(--text-muted);">Displays over 'Years Experience'</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Projects Stat</label>
+              <input type="text" id="settingProjectsDone" class="form-control" placeholder="50+">
+              <small style="color:var(--text-muted);">Displays over 'Projects Done'</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Clients Stat</label>
+              <input type="text" id="settingHappyClients" class="form-control" placeholder="20+">
+              <small style="color:var(--text-muted);">Displays over 'Happy Clients'</small>
+            </div>
+          </div>
+
+          <h3 class="form-sub-heading">Media Assets & Resumes</h3>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Hero Cutout Portrait URL</label>
+              <input type="text" id="settingPortraitUrl" class="form-control" placeholder="assets/images/hero-portrait.svg or https://...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CV / Resume PDF URL</label>
+              <input type="text" id="settingCvUrl" class="form-control" placeholder="assets/docs/asif-raza-resume.pdf">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">About Me Bio</label>
+            <textarea id="settingBio" class="form-control" rows="3"></textarea>
+          </div>
+
+          <h3 class="form-sub-heading">Contact & Social Channels</h3>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Contact Email</label>
+              <input type="email" id="settingContactEmail" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone / WhatsApp</label>
+              <input type="text" id="settingContactPhone" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Instagram Profile URL</label>
+              <input type="url" id="settingInstagram" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">YouTube Channel URL</label>
+              <input type="url" id="settingYoutube" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">LinkedIn Profile URL</label>
+              <input type="url" id="settingLinkedin" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Behance Portfolio URL</label>
+              <input type="url" id="settingBehance" class="form-control">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="saveSettingsBtn" style="margin-top:20px;">
+            Save All Settings
+          </button>
+        </form>
+      </section>
+
+      <!-- ================= TAB 5: INQUIRIES ================= -->
+      <section class="admin-tab-pane" id="tab-inquiries">
+        <div class="pane-action-header">
+          <div>
+            <h2 class="admin-pane-title">Client Inquiries</h2>
+            <p class="admin-pane-desc">Project inquiries submitted by prospective clients through the contact form.</p>
+          </div>
+          <button class="btn btn-outline" onclick="window.loadInquiries()">Refresh</button>
+        </div>
+
+        <div class="inquiries-list" id="inquiriesContainer">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =======================================================================
+       PROJECT MODAL (Add / Edit)
+       ======================================================================= -->
+  <div class="admin-modal-backdrop" id="projectModal">
+    <div class="admin-modal-box">
+      <div class="modal-header">
+        <h3 id="projectModalTitle">Add New Video Project</h3>
+        <button class="modal-close" onclick="window.closeModals()">&times;</button>
+      </div>
+      <form id="projectForm" class="modal-body">
+        <input type="hidden" id="projId">
+        <div class="form-group">
+          <label class="form-label">Project Title *</label>
+          <input type="text" id="projTitle" class="form-control" required placeholder="e.g. Nike Commercial - Just Do It">
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select id="projCategory" class="form-control" required>
+              <option value="reels">Reels & Shorts</option>
+              <option value="commercial">Commercial / YouTube</option>
+              <option value="color-grading">Color Grading</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Client / Result Metric</label>
+            <input type="text" id="projMetric" class="form-control" placeholder="e.g. 3.2M Views or Official Selection">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Video Embed / URL *</label>
+          <input type="text" id="projVideoUrl" class="form-control" required placeholder="https://www.youtube.com/watch?v=... or MP4 URL">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Thumbnail Image URL *</label>
+          <input type="text" id="projThumbUrl" class="form-control" required placeholder="assets/images/thumb-1.jpg or https://...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tags (comma-separated)</label>
+          <input type="text" id="projTags" class="form-control" placeholder="Reels, Speed Ramping, Sound Design">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Project Description</label>
+          <textarea id="projDesc" class="form-control" rows="2" placeholder="Brief project summary..."></textarea>
+        </div>
+
+        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="projFeatured" style="width:18px; height:18px; accent-color:var(--accent-orange);">
+          <label for="projFeatured" style="font-size:0.9rem; cursor:pointer;">Mark as Featured</label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.closeModals()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveProjectBtn">Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       COLOR GRADE MODAL (Add / Edit)
+       ======================================================================= -->
+  <div class="admin-modal-backdrop" id="colorGradeModal">
+    <div class="admin-modal-box">
+      <div class="modal-header">
+        <h3 id="colorModalTitle">Add Color Grade Comparison</h3>
+        <button class="modal-close" onclick="window.closeModals()">&times;</button>
+      </div>
+      <form id="colorGradeForm" class="modal-body">
+        <input type="hidden" id="colorId">
+        <div class="form-group">
+          <label class="form-label">Comparison Title *</label>
+          <input type="text" id="colorTitle" class="form-control" required placeholder="e.g. Moody Night City Look Dev">
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Before Image URL (RAW / LOG) *</label>
+            <input type="text" id="colorBeforeUrl" class="form-control" required placeholder="assets/images/before-grade-1.jpg">
+          </div>
+          <div class="form-group">
+            <label class="form-label">After Image URL (Graded Look) *</label>
+            <input type="text" id="colorAfterUrl" class="form-control" required placeholder="assets/images/after-grade-1.jpg">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Camera & Sensor Profile</label>
+            <input type="text" id="colorCamera" class="form-control" placeholder="e.g. Sony FX3 S-Log3 / ARRI LogC">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color Space / Transform</label>
+            <input type="text" id="colorSpace" class="form-control" placeholder="e.g. ACEScc / DaVinci Wide Gamut to Rec.709">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Look Notes / Description</label>
+          <textarea id="colorNotes" class="form-control" rows="2" placeholder="Kodak 2383 emulation, balanced skin tones..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.closeModals()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveColorBtn">Save Comparison</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Config & Admin Script -->
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

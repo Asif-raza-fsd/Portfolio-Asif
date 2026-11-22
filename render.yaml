@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: asif-raza-portfolio-server
+    env: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@asifraza.com
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CLIENT_URL
+        value: https://asif-raza-portfolio.netlify.app

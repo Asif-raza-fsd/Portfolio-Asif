@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="warmSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E25800"/>
+      <stop offset="40%" stop-color="#FF9D2E"/>
+      <stop offset="70%" stop-color="#FFD182"/>
+      <stop offset="100%" stop-color="#A53A00"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF2D6"/>
+      <stop offset="40%" stop-color="#FFB347"/>
+      <stop offset="100%" stop-color="#FF5D00" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#warmSky)"/>
+  <circle cx="400" cy="200" r="130" fill="url(#sunGlow)"/>
+  <circle cx="400" cy="200" r="50" fill="#FFF7E6"/>
+  <!-- Dunes with rich shadows and warm golden crests -->
+  <path d="M0 340 Q 200 300 400 350 T 800 330 L 800 500 L 0 500 Z" fill="#963503"/>
+  <path d="M0 380 Q 250 340 500 390 T 800 370 L 800 500 L 0 500 Z" fill="#521A00"/>
+  <!-- Highlight rim on sand dunes -->
+  <path d="M0 340 Q 200 300 400 350 T 800 330" stroke="#FFBF66" stroke-width="4" fill="none"/>
+  <text x="40" y="60" fill="#FFF0D4" font-family="sans-serif" font-size="22" font-weight="700">KODAK 2383 FILM PRINT EMULATION</text>
+  <text x="40" y="90" fill="#FFE0B2" font-family="sans-serif" font-size="14">ACEScc • Custom Highlight Roll-Off • Golden Hour Harmonies</text>
+</svg>
