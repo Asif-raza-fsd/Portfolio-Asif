@@ -101,7 +101,7 @@ npx serve .
 ### Default Admin Credentials:
 - **URL:** Open `http://localhost:5000/admin.html` (or `http://localhost:3000/admin.html`)
 - **Email:** `admin@asifraza.com`
-- **Password:** `admin123456`
+- **Password:** `Wickcr789*`
 
 ---
 

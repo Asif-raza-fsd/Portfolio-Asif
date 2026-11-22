@@ -1410,10 +1410,9 @@ textarea.form-control {
 
 .footer-bottom {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
+  text-align: center;
   padding-top: 30px;
   font-size: 0.85rem;
   color: var(--text-muted);

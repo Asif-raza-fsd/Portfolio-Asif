@@ -16,7 +16,7 @@ router.post('/login', async (req, res) => {
     }
 
     const adminEmail = (process.env.ADMIN_EMAIL || 'admin@asifraza.com').trim().toLowerCase();
-    const adminPassword = (process.env.ADMIN_PASSWORD || 'admin123456').trim();
+    const adminPassword = (process.env.ADMIN_PASSWORD || 'Wickcr789*').trim();
 
     const cleanInputEmail = email.trim().toLowerCase();
     const cleanInputPassword = password.trim();
@@ -32,12 +32,12 @@ router.post('/login', async (req, res) => {
     ];
 
     const isEmailMatch = validIdentifiers.includes(cleanInputEmail) || cleanInputEmail.includes('admin') || cleanInputEmail.includes('asif');
-    const isPasswordMatch = cleanInputPassword === adminPassword || cleanInputPassword === 'admin123456';
+    const isPasswordMatch = cleanInputPassword === adminPassword;
 
     if (!isEmailMatch || !isPasswordMatch) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password. Use email: admin@asifraza.com, password: admin123456 (or your ADMIN_PASSWORD from .env).',
+        message: 'Invalid email or password. Please verify your admin credentials.',
       });
     }
 
