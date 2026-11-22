@@ -136,60 +136,17 @@
         </div>
 
         <!-- ===================================================================
-             INTERACTIVE BEFORE & AFTER COLOR GRADING SLIDER
+             COLOR GRADING SHOWCASE (Rendered Downwise for Every Look)
              =================================================================== -->
         <div class="color-grade-showcase">
           <div class="showcase-header text-center">
-            <h2 class="section-title">Interactive Color Grading Comparison</h2>
-            <p class="section-subtitle">Drag the orange slider handle horizontally to compare raw camera sensor LOG against the final graded cinematic look.</p>
+            <h2 class="section-title">Color Grading Look Development</h2>
+            <p class="section-subtitle">Drag the slider horizontally or view side-by-side to compare raw camera sensor LOG against the final graded cinematic look.</p>
           </div>
 
-          <div class="comparison-wrapper">
-            <!-- Slider Component -->
-            <div class="slider-container" id="colorGradeSlider" aria-label="Before and after color grade comparison">
-              <!-- After (Graded Look - Full background) -->
-              <img src="assets/images/after-grade-1.jpg" alt="Final Color Graded Shot" class="slider-image image-after" id="sliderAfterImg">
-
-              <!-- Before (Raw LOG - Clipped overlay) -->
-              <div class="image-before-wrap" id="sliderBeforeWrap">
-                <img src="assets/images/before-grade-1.jpg" alt="Raw LOG Uncorrected Footage" class="image-before" id="sliderBeforeImg">
-              </div>
-
-              <!-- Draggable Divider Line & Knob -->
-              <div class="slider-handle" id="sliderHandle">
-                <div class="slider-knob">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                    <polyline points="9 18 3 12 9 6"></polyline>
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Comparison Badges -->
-              <div class="slider-badge badge-raw">RAW LOG (S-Log3)</div>
-              <div class="slider-badge badge-graded">CINEMATIC GRADE</div>
-            </div>
-
-            <!-- Comparison Metadata Bar -->
-            <div class="comparison-info-bar">
-              <div class="comparison-tech">
-                <div class="tech-spec">
-                  <span class="tech-spec-label">Camera & Sensor</span>
-                  <span class="tech-spec-value" id="compCamera">Sony FX3 (S-Log3 / S-Gamut3.Cine)</span>
-                </div>
-                <div class="tech-spec">
-                  <span class="tech-spec-label">Color Space & Target</span>
-                  <span class="tech-spec-value" id="compColorSpace">DaVinci Wide Gamut to Rec.709 2.4</span>
-                </div>
-                <div class="tech-spec">
-                  <span class="tech-spec-label">Look Notes</span>
-                  <span class="tech-spec-value" id="compNotes">Custom tone curve, saturated streetlamp separation, and soft skin tone highlights.</span>
-                </div>
-              </div>
-
-              <!-- Toggle Comparison Selector if multiple are available -->
-              <div id="comparisonSelector" style="display:flex; gap:8px;"></div>
-            </div>
+          <!-- Color Grade Comparisons: Rendered Downwise On-Screen for Every Look -->
+          <div class="color-grades-list" id="colorGradesList">
+            <!-- Dynamically populated from backend -->
           </div>
         </div>
 

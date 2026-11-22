@@ -288,6 +288,12 @@ document.addEventListener('DOMContentLoaded', () => {
         tab.classList.add('active');
         state.activeCategory = tab.dataset.category;
         renderProjects();
+        if (tab.dataset.category === 'color-grading') {
+          const showcase = document.querySelector('.color-grade-showcase');
+          if (showcase) {
+            showcase.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
       });
     });
   }
@@ -370,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================================================
-     6. BEFORE & AFTER COLOR GRADING SLIDER
+     6. BEFORE & AFTER COLOR GRADING SHOWCASE (Downwise for All Looks)
      ========================================================================== */
   async function loadColorGrades() {
     try {
@@ -378,125 +384,200 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         state.colorGrades = data.data;
-        renderColorGradeComparison(0);
-        renderComparisonSelectors();
+        renderAllColorGrades();
       }
     } catch (err) {
       console.warn('Could not fetch color grades:', err);
     }
   }
 
-  function renderColorGradeComparison(index) {
-    const item = state.colorGrades[index];
-    if (!item) return;
+  function renderAllColorGrades() {
+    const listEl = document.getElementById('colorGradesList');
+    if (!listEl) return;
 
-    state.activeComparisonIndex = index;
-    if (sliderAfterImg) {
-      sliderAfterImg.src = item.afterImageUrl;
-      sliderAfterImg.onload = () => {
-        if (sliderAfterImg.naturalWidth && sliderAfterImg.naturalHeight && colorGradeSlider) {
-          // Dynamically adjust slider container ratio to match the EXACT natural photo ratio
-          colorGradeSlider.style.aspectRatio = `${sliderAfterImg.naturalWidth} / ${sliderAfterImg.naturalHeight}`;
-          setSliderPosition(50);
-        }
-      };
+    if (!state.colorGrades || state.colorGrades.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:40px; color:var(--text-secondary);">
+          No color grading comparisons added yet.
+        </div>
+      `;
+      return;
     }
-    if (sliderBeforeImg) {
-      sliderBeforeImg.src = item.beforeImageUrl;
-      sliderBeforeImg.onload = () => {
-        setSliderPosition(50);
-      };
+
+    listEl.innerHTML = state.colorGrades.map((item, idx) => {
+      return `
+        <div class="color-grade-card" data-index="${idx}">
+          <!-- Comparison Header with Title and Mode Toggle -->
+          <div class="color-grade-header">
+            <div class="color-grade-title-wrap">
+              <h3 class="color-grade-title">${escapeHtml(item.title || `Cinematic Look #${idx + 1}`)}</h3>
+              ${item.camera ? `<span class="color-grade-badge">${escapeHtml(item.camera)}</span>` : ''}
+              ${item.colorSpace ? `<span class="color-grade-badge color-grade-badge-muted">${escapeHtml(item.colorSpace)}</span>` : ''}
+            </div>
+            <div class="view-mode-toggle">
+              <button type="button" class="mode-btn active" onclick="window.toggleGradeView(${idx}, 'slider')" id="btnSlider-${idx}">↔ Split Slider</button>
+              <button type="button" class="mode-btn" onclick="window.toggleGradeView(${idx}, 'side')" id="btnSide-${idx}">⊞ Side-by-Side</button>
+            </div>
+          </div>
+
+          <!-- Interactive Slider View (Natural Height with Zero Cropping) -->
+          <div class="slider-container" id="gradeSlider-${idx}" aria-label="Before and after color grade comparison for ${escapeHtml(item.title)}">
+            <img src="${escapeHtml(item.afterImageUrl)}" alt="Graded Look" class="slider-image image-after" loading="lazy">
+            <div class="image-before-wrap">
+              <img src="${escapeHtml(item.beforeImageUrl)}" alt="Raw LOG Footage" class="image-before" loading="lazy">
+            </div>
+            <div class="slider-handle">
+              <div class="slider-knob">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                  <polyline points="9 18 3 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="slider-badge badge-raw">RAW LOG (S-LOG3)</div>
+            <div class="slider-badge badge-graded">CINEMATIC GRADE</div>
+          </div>
+
+          <!-- Side-by-Side View (Full frames with zero cropping) -->
+          <div class="side-by-side-container" id="gradeSide-${idx}" style="display:none;">
+            <div class="side-col">
+              <div class="side-col-media">
+                <img src="${escapeHtml(item.beforeImageUrl)}" alt="Raw LOG Camera Sensor" class="side-img" loading="lazy">
+                <span class="slider-badge badge-raw">RAW LOG</span>
+              </div>
+              <span class="side-col-label">Camera Sensor Uncorrected</span>
+            </div>
+            <div class="side-col">
+              <div class="side-col-media">
+                <img src="${escapeHtml(item.afterImageUrl)}" alt="Final Graded Look" class="side-img" loading="lazy">
+                <span class="slider-badge badge-graded">FINAL GRADE</span>
+              </div>
+              <span class="side-col-label">Rec.709 Graded Delivery</span>
+            </div>
+          </div>
+
+          <!-- Comparison Metadata Bar -->
+          <div class="comparison-info-bar">
+            <div class="comparison-tech">
+              <div class="tech-spec">
+                <span class="tech-spec-label">Camera & Sensor</span>
+                <span class="tech-spec-value">${escapeHtml(item.camera || 'Sony FX3 (S-Log3 / S-Gamut3.Cine)')}</span>
+              </div>
+              <div class="tech-spec">
+                <span class="tech-spec-label">Color Space & Target</span>
+                <span class="tech-spec-value">${escapeHtml(item.colorSpace || 'DaVinci Wide Gamut to Rec.709 2.4')}</span>
+              </div>
+              <div class="tech-spec">
+                <span class="tech-spec-label">Look Notes</span>
+                <span class="tech-spec-value">${escapeHtml(item.notes || item.description || 'Custom film print emulation with natural skin tones.')}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Initialize all sliders after DOM render
+    state.colorGrades.forEach((_, idx) => {
+      const sliderEl = document.getElementById(`gradeSlider-${idx}`);
+      if (sliderEl) initColorGradeSlider(sliderEl);
+    });
+  }
+
+  function initColorGradeSlider(containerEl) {
+    const beforeWrap = containerEl.querySelector('.image-before-wrap');
+    const beforeImg = containerEl.querySelector('.image-before');
+    const afterImg = containerEl.querySelector('.image-after');
+    const handle = containerEl.querySelector('.slider-handle');
+
+    if (!beforeWrap || !beforeImg || !handle) return;
+
+    let isDragging = false;
+
+    function syncWidths() {
+      if (beforeImg && containerEl) {
+        beforeImg.style.width = `${containerEl.offsetWidth}px`;
+        beforeImg.style.height = `${containerEl.offsetHeight}px`;
+      }
     }
-    if (compCamera) compCamera.textContent = item.camera || 'DaVinci Resolve Studio';
-    if (compColorSpace) compColorSpace.textContent = item.colorSpace || 'ACEScc / Rec.709';
-    if (compNotes) compNotes.textContent = item.notes || item.description || 'Cinematic look development.';
 
-    // Reset slider to 50%
-    setSliderPosition(50);
-  }
-
-  function renderComparisonSelectors() {
-    if (!comparisonSelector || state.colorGrades.length <= 1) return;
-
-    comparisonSelector.innerHTML = state.colorGrades
-      .map(
-        (item, idx) => `
-        <button class="filter-tab ${idx === state.activeComparisonIndex ? 'active' : ''}" style="padding:6px 14px; font-size:0.8rem;" onclick="window.selectComparison(${idx})">
-          Look ${idx + 1}
-        </button>
-      `
-      )
-      .join('');
-  }
-
-  window.selectComparison = function (idx) {
-    renderColorGradeComparison(idx);
-    renderComparisonSelectors();
-  };
-
-  // Interactive Dragging Logic
-  let isDragging = false;
-
-  function setSliderPosition(percentage) {
-    const clamped = Math.max(0, Math.min(100, percentage));
-    if (sliderBeforeWrap) sliderBeforeWrap.style.width = `${clamped}%`;
-    if (sliderHandle) sliderHandle.style.left = `${clamped}%`;
-    if (sliderBeforeImg && colorGradeSlider) {
-      sliderBeforeImg.style.width = `${colorGradeSlider.offsetWidth}px`;
-      sliderBeforeImg.style.height = `${colorGradeSlider.offsetHeight}px`;
+    function setPos(percentage) {
+      const clamped = Math.max(0, Math.min(100, percentage));
+      beforeWrap.style.width = `${clamped}%`;
+      handle.style.left = `${clamped}%`;
+      syncWidths();
     }
-  }
 
-  function handleSliderMove(e) {
-    if (!isDragging || !colorGradeSlider) return;
-    const rect = colorGradeSlider.getBoundingClientRect();
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    if (!clientX) return;
-    const x = clientX - rect.left;
-    const percentage = (x / rect.width) * 100;
-    setSliderPosition(percentage);
-  }
+    if (afterImg) {
+      if (afterImg.complete) {
+        syncWidths();
+        setPos(50);
+      } else {
+        afterImg.onload = () => {
+          syncWidths();
+          setPos(50);
+        };
+      }
+    }
 
-  if (colorGradeSlider) {
-    // Mouse events
-    colorGradeSlider.addEventListener('mousedown', (e) => {
+    function onMove(e) {
+      if (!isDragging) return;
+      const rect = containerEl.getBoundingClientRect();
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      if (!clientX) return;
+      const x = clientX - rect.left;
+      const percentage = (x / rect.width) * 100;
+      setPos(percentage);
+    }
+
+    containerEl.addEventListener('mousedown', (e) => {
       isDragging = true;
-      handleSliderMove(e);
+      onMove(e);
     });
 
-    window.addEventListener('mousemove', handleSliderMove);
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', () => { isDragging = false; });
 
-    // Touch events for mobile
-    colorGradeSlider.addEventListener('touchstart', (e) => {
+    containerEl.addEventListener('touchstart', (e) => {
       isDragging = true;
-      handleSliderMove(e);
+      onMove(e);
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
-      if (isDragging) handleSliderMove(e);
+      if (isDragging) onMove(e);
     }, { passive: true });
 
-    window.addEventListener('touchend', () => {
-      isDragging = false;
-    });
+    window.addEventListener('touchend', () => { isDragging = false; });
 
-    // Resize event to maintain exact inner width of before image
-    window.addEventListener('resize', () => {
-      if (sliderBeforeImg && colorGradeSlider) {
-        sliderBeforeImg.style.width = `${colorGradeSlider.offsetWidth}px`;
-      }
-    });
-
-    // Initialize width
-    setTimeout(() => {
-      if (sliderBeforeImg && colorGradeSlider) {
-        sliderBeforeImg.style.width = `${colorGradeSlider.offsetWidth}px`;
-      }
-    }, 200);
+    window.addEventListener('resize', syncWidths);
+    setTimeout(syncWidths, 300);
   }
+
+  window.toggleGradeView = function(idx, mode) {
+    const sliderEl = document.getElementById(`gradeSlider-${idx}`);
+    const sideEl = document.getElementById(`gradeSide-${idx}`);
+    const btnSlider = document.getElementById(`btnSlider-${idx}`);
+    const btnSide = document.getElementById(`btnSide-${idx}`);
+
+    if (mode === 'side') {
+      if (sliderEl) sliderEl.style.display = 'none';
+      if (sideEl) sideEl.style.display = 'grid';
+      if (btnSlider) btnSlider.classList.remove('active');
+      if (btnSide) btnSide.classList.add('active');
+    } else {
+      if (sliderEl) {
+        sliderEl.style.display = 'block';
+        const beforeImg = sliderEl.querySelector('.image-before');
+        if (beforeImg) {
+          beforeImg.style.width = `${sliderEl.offsetWidth}px`;
+          beforeImg.style.height = `${sliderEl.offsetHeight}px`;
+        }
+      }
+      if (sideEl) sideEl.style.display = 'none';
+      if (btnSlider) btnSlider.classList.add('active');
+      if (btnSide) btnSide.classList.remove('active');
+    }
+  };
 
   /* ==========================================================================
      7. CONTACT INQUIRY FORM SUBMISSION
