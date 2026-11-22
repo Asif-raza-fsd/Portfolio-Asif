@@ -5,7 +5,7 @@
 const CONFIG = {
   // SET YOUR DEPLOYED RENDER BACKEND URL HERE:
   // e.g., 'https://asif-raza-portfolio-api.onrender.com'
-  PRODUCTION_API_URL: 'https://asif-raza-portfolio-api.onrender.com',
+  PRODUCTION_API_URL: 'https://portfolio-asif.onrender.com',
 
   API_BASE_URL: (() => {
     // 1. Allow manual override via ?api=... query parameter, window variable, or localStorage
@@ -18,7 +18,7 @@ const CONFIG = {
         localStorage.setItem('asif_portfolio_custom_api', urlParams.get('api'));
         return urlParams.get('api');
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const hostname = window.location.hostname;
     // 2. Local development: ALWAYS point to backend on port 5050
