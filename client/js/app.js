@@ -234,11 +234,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     projectsGrid.innerHTML = filtered
-      .map(
-        (p) => `
-        <article class="project-card" data-id="${p._id}">
+      .map((p) => {
+        const isVertical = p.category === 'reels' || (p.videoUrl && (p.videoUrl.includes('/shorts/') || p.videoUrl.includes('tiktok.com')));
+        return `
+        <article class="project-card ${isVertical ? 'is-vertical' : ''}" data-id="${p._id}">
           <div class="project-thumb-wrap" onclick="window.openProjectModal('${p._id}')" role="button" tabindex="0" aria-label="Play video for ${escapeHtml(p.title)}">
-            <img src="${escapeHtml(p.thumbnailUrl)}" alt="${escapeHtml(p.title)}" class="project-thumb" loading="lazy">
+            <img src="${escapeHtml(p.thumbnailUrl)}" alt="${escapeHtml(p.title)}" class="project-thumb" loading="lazy" onload="if(this.naturalHeight > this.naturalWidth) this.closest('.project-card')?.classList.add('is-vertical');">
             <div class="project-overlay">
               <div class="play-button-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
@@ -261,8 +262,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           </div>
         </article>
-      `
-      )
+      `;
+      })
       .join('');
   }
 
@@ -300,34 +301,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let embedHtml = '';
     const videoUrl = project.videoUrl.trim();
+    const modalBox = document.querySelector('.video-modal-box');
+    const isVertical = project.category === 'reels' || videoUrl.includes('/shorts/') || videoUrl.includes('tiktok.com');
 
-    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-      // Extract YouTube ID
-      let videoId = '';
-      if (videoUrl.includes('embed/')) {
-        videoId = videoUrl.split('embed/')[1].split('?')[0];
-      } else if (videoUrl.includes('v=')) {
-        videoId = videoUrl.split('v=')[1].split('&')[0];
-      } else if (videoUrl.includes('youtu.be/')) {
-        videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
-      }
+    if (modalBox) {
+      modalBox.classList.toggle('is-vertical', isVertical);
+    }
+
+    // Comprehensive YouTube ID extractor (matches shorts, watch, embed, and youtu.be)
+    const ytMatch = videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i);
+
+    if (ytMatch && ytMatch[1]) {
+      const videoId = ytMatch[1];
       embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" title="${escapeHtml(
         project.title
       )}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
     } else if (videoUrl.includes('vimeo.com')) {
-      const vimeoId = videoUrl.split('/').pop().split('?')[0];
-      embedHtml = `<iframe src="https://player.vimeo.com/video/${vimeoId}?autoplay=1&color=FD6F00" title="${escapeHtml(
+      const vimeoMatch = videoUrl.match(/vimeo\.com\/(?:video\/)?([0-9]+)/i);
+      const vimeoId = vimeoMatch ? vimeoMatch[1] : videoUrl.split('/').pop().split('?')[0];
+      embedHtml = `<iframe src="https://player.vimeo.com/video/${vimeoId}?autoplay=1&color=E5B574" title="${escapeHtml(
         project.title
       )}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
     } else {
-      // Direct MP4 video file
-      embedHtml = `<video controls autoplay playsinline style="width:100%;height:100%;background:#000;">
+      // Direct MP4 video file - adapt dynamically to video's native ratio
+      embedHtml = `<video controls autoplay playsinline style="width:100%;height:100%;background:#000;object-fit:contain;">
         <source src="${escapeHtml(videoUrl)}" type="video/mp4">
         Your browser does not support the video tag.
       </video>`;
     }
 
     videoContainer.innerHTML = embedHtml;
+
+    // Metadata listener for direct MP4 to match native aspect ratio
+    const videoEl = videoContainer.querySelector('video');
+    if (videoEl) {
+      videoEl.onloadedmetadata = () => {
+        if (videoEl.videoWidth && videoEl.videoHeight) {
+          const isPortrait = videoEl.videoHeight > videoEl.videoWidth;
+          if (modalBox) modalBox.classList.toggle('is-vertical', isPortrait);
+          videoContainer.style.aspectRatio = `${videoEl.videoWidth} / ${videoEl.videoHeight}`;
+        }
+      };
+    }
+
     videoModal.classList.add('active');
     videoModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -375,8 +391,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!item) return;
 
     state.activeComparisonIndex = index;
-    if (sliderBeforeImg) sliderBeforeImg.src = item.beforeImageUrl;
-    if (sliderAfterImg) sliderAfterImg.src = item.afterImageUrl;
+    if (sliderAfterImg) {
+      sliderAfterImg.src = item.afterImageUrl;
+      sliderAfterImg.onload = () => {
+        if (sliderAfterImg.naturalWidth && sliderAfterImg.naturalHeight && colorGradeSlider) {
+          // Dynamically adjust slider container ratio to match the EXACT natural photo ratio
+          colorGradeSlider.style.aspectRatio = `${sliderAfterImg.naturalWidth} / ${sliderAfterImg.naturalHeight}`;
+          setSliderPosition(50);
+        }
+      };
+    }
+    if (sliderBeforeImg) {
+      sliderBeforeImg.src = item.beforeImageUrl;
+      sliderBeforeImg.onload = () => {
+        setSliderPosition(50);
+      };
+    }
     if (compCamera) compCamera.textContent = item.camera || 'DaVinci Resolve Studio';
     if (compColorSpace) compColorSpace.textContent = item.colorSpace || 'ACEScc / Rec.709';
     if (compNotes) compNotes.textContent = item.notes || item.description || 'Cinematic look development.';
@@ -413,6 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sliderHandle) sliderHandle.style.left = `${clamped}%`;
     if (sliderBeforeImg && colorGradeSlider) {
       sliderBeforeImg.style.width = `${colorGradeSlider.offsetWidth}px`;
+      sliderBeforeImg.style.height = `${colorGradeSlider.offsetHeight}px`;
     }
   }
 

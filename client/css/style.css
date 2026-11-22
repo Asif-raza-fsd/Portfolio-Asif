@@ -822,17 +822,26 @@ img, svg {
 .project-thumb-wrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: #0D0D0D;
+  background: #0A0B0E;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .project-thumb {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #0A0B0E;
   transition: transform 0.5s ease;
+}
+
+.project-card.is-vertical .project-thumb-wrap {
+  aspect-ratio: 9 / 16;
+  max-height: 480px;
 }
 
 .project-card:hover .project-thumb {
@@ -957,14 +966,18 @@ img, svg {
 .slider-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  max-height: 520px;
+  aspect-ratio: 16 / 9;
+  max-height: 720px;
   border-radius: var(--radius-md);
   overflow: hidden;
   user-select: none;
   cursor: ew-resize;
   border: 1px solid var(--border-light);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  background: #0A0B0E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .slider-image {
@@ -973,7 +986,8 @@ img, svg {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #0A0B0E;
 }
 
 .image-after {
@@ -988,6 +1002,7 @@ img, svg {
   height: 100%;
   overflow: hidden;
   z-index: 2;
+  background: #0A0B0E;
 }
 
 .image-before {
@@ -996,7 +1011,8 @@ img, svg {
   left: 0;
   width: 100%; /* matched to parent container width dynamically */
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #0A0B0E;
   max-width: none;
 }
 
@@ -1293,12 +1309,26 @@ textarea.form-control {
   overflow: hidden;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
   border: 1px solid var(--border-light);
+  transition: max-width 0.3s ease;
+}
+
+.video-modal-box.is-vertical {
+  max-width: 440px;
 }
 
 .video-frame-container {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-modal-box.is-vertical .video-frame-container {
+  aspect-ratio: 9 / 16;
+  max-height: 82vh;
 }
 
 .video-frame-container iframe,
@@ -1306,6 +1336,7 @@ textarea.form-control {
   width: 100%;
   height: 100%;
   border: none;
+  object-fit: contain;
 }
 
 .modal-close-btn {
