@@ -949,24 +949,24 @@ img, svg {
   background: #141519;
   border: 1px solid var(--border-card);
   border-radius: var(--radius-lg);
-  padding: 40px 32px;
-  margin-top: 40px;
+  padding: 32px 28px;
+  margin-top: 36px;
 }
 
 .color-grades-list {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 32px;
 }
 
 .color-grade-card {
   background: #18191E;
   border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
-  padding: 28px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
 }
 
@@ -1135,7 +1135,7 @@ img, svg {
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 3px;
+  width: 2.5px;
   background: var(--accent-orange);
   z-index: 3;
   transform: translateX(-50%);
@@ -1148,8 +1148,8 @@ img, svg {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--accent-gradient);
   border: 2px solid #FFFFFF;
@@ -1161,33 +1161,41 @@ img, svg {
 }
 
 .slider-knob svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Floating Badges */
 .slider-badge {
   position: absolute;
-  bottom: 18px;
+  bottom: 14px;
   z-index: 4;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: var(--radius-sm);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   pointer-events: none;
 }
 
+.badge-text-compact {
+  display: none;
+}
+
+.badge-text-full {
+  display: inline;
+}
+
 .badge-raw {
-  left: 18px;
+  left: 14px;
   background: rgba(30, 30, 30, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #D2D2D2;
 }
 
 .badge-graded {
-  right: 18px;
+  right: 14px;
   background: var(--accent-gradient);
   color: #0A0B0E;
   font-weight: 700;
@@ -1203,32 +1211,36 @@ img, svg {
   gap: 16px;
   background: var(--bg-card);
   border: 1px solid var(--border-card);
-  padding: 18px 24px;
+  padding: 14px 18px;
   border-radius: var(--radius-sm);
 }
 
 .comparison-tech {
   display: flex;
-  gap: 24px;
+  gap: 22px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .tech-spec {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .tech-spec-label {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   color: var(--text-muted);
   font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 .tech-spec-value {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--text-primary);
   font-weight: 600;
+  line-height: 1.35;
 }
 
 /* ==========================================================================
@@ -1575,52 +1587,109 @@ textarea.form-control {
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN (Media Queries)
+   RESPONSIVE DESIGN (Media Queries for Laptop, Tablet, & Mobile)
    ========================================================================== */
+
+/* --- TABLETS & SMALL LAPTOPS (max-width: 1024px) --- */
 @media (max-width: 1024px) {
+  .container {
+    padding: 0 20px;
+  }
   .hero-grid {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 60px;
+    gap: 50px;
   }
   .hero-content {
     align-items: center;
   }
   .hero-title {
-    font-size: 3.4rem;
+    font-size: 3.2rem;
   }
   .hero-socials, .hero-ctas {
     justify-content: center;
   }
   .hero-circle-backdrop {
-    width: 380px;
-    height: 380px;
+    width: 360px;
+    height: 360px;
   }
   .about-grid, .contact-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 36px;
   }
   .services-grid, .projects-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .contact-form-wrap {
+    padding: 32px 28px;
+  }
+
+  /* Color Grading on Tablet: Tighter padding, photo takes more width */
+  .color-grade-showcase {
+    padding: 22px 18px;
+    margin-top: 30px;
+    border-radius: var(--radius-md);
+  }
+  .color-grades-list {
+    gap: 26px;
+  }
+  .color-grade-card {
+    padding: 16px 14px;
+    gap: 12px;
+  }
+  .color-grade-title {
+    font-size: 1.12rem;
+  }
+  .slider-knob {
+    width: 32px;
+    height: 32px;
+  }
+  .slider-knob svg {
+    width: 16px;
+    height: 16px;
+  }
+  .slider-badge {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    bottom: 12px;
+  }
+  .comparison-info-bar {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .comparison-tech {
+    gap: 16px;
+  }
+  .tech-spec-label {
+    font-size: 0.68rem;
+  }
+  .tech-spec-value {
+    font-size: 0.82rem;
   }
 }
 
+/* --- MOBILE PHONES (max-width: 768px) --- */
 @media (max-width: 768px) {
+  .container {
+    padding: 0 14px;
+  }
   .site-header {
-    height: 72px;
+    height: 68px;
   }
   .mobile-toggle {
     display: flex;
   }
   .nav-menu {
     position: fixed;
-    top: 72px;
+    top: 68px;
     left: 0;
     width: 100%;
-    background: #161616;
+    background: rgba(18, 18, 20, 0.98);
+    backdrop-filter: blur(20px);
     flex-direction: column;
-    padding: 30px 24px;
-    gap: 20px;
+    padding: 24px 20px;
+    gap: 16px;
     border-bottom: 1px solid var(--border-card);
     transform: translateY(-150%);
     opacity: 0;
@@ -1635,39 +1704,304 @@ textarea.form-control {
   .nav-actions .btn-nav {
     display: none;
   }
+
+  /* Section Spacing on Mobile */
+  .hero-section {
+    padding: 30px 0 50px 0;
+    min-height: auto;
+  }
+  .services-section,
+  .about-section,
+  .portfolio-section,
+  .contact-section {
+    padding: 50px 0;
+  }
+  .section-title {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+  .section-subtitle {
+    font-size: 0.88rem;
+    margin-bottom: 22px;
+  }
+
+  /* Hero on Mobile */
   .hero-title {
-    font-size: 2.7rem;
+    font-size: clamp(2rem, 8vw, 2.7rem);
+    line-height: 1.15;
+  }
+  .hero-bio {
+    font-size: 0.92rem;
+    line-height: 1.55;
   }
   .hero-circle-backdrop {
-    width: 320px;
-    height: 320px;
+    width: 270px;
+    height: 270px;
   }
   .hero-portrait-wrap {
-    width: 300px;
+    width: 260px;
   }
   .hero-stats-card {
-    padding: 18px 20px;
+    padding: 12px 14px;
     width: 100%;
+    gap: 10px;
   }
   .stat-number {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
+  .stat-label {
+    font-size: 0.72rem;
+  }
+  .hero-ctas {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+  .hero-ctas .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Portfolio Tabs on Mobile */
+  .portfolio-filter-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    gap: 8px;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+  .portfolio-filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .filter-tab {
+    padding: 8px 16px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
   .services-grid, .projects-grid {
     grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .project-card, .service-card {
+    padding: 20px 16px;
+  }
+
+  /* =========================================================================
+     COLOR GRADING ON MOBILE - MAXIMUM PHOTO SIZE & STREAMLINED DETAILS
+     ========================================================================= */
+  .color-grade-showcase {
+    padding: 10px 8px;
+    margin-top: 20px;
+    border-radius: 12px;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .color-grades-list {
+    gap: 18px;
+  }
+  .color-grade-card {
+    padding: 10px 8px;
+    gap: 8px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  .color-grade-header {
+    gap: 6px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .color-grade-title-wrap {
+    gap: 6px;
+  }
+  .color-grade-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+  .color-grade-badge {
+    font-size: 0.62rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* Slider & Photo: Expanded to full mobile width */
+  .slider-container {
+    border-radius: 8px;
+  }
+  .slider-handle {
+    width: 2px;
+  }
+  .slider-knob {
+    width: 28px;
+    height: 28px;
+    border-width: 1.5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  }
+  .slider-knob svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* Compact Floating Badges */
+  .slider-badge {
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    bottom: 8px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+  }
+  .badge-raw {
+    left: 8px;
+    background: rgba(12, 12, 12, 0.78);
+    backdrop-filter: blur(4px);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .badge-graded {
+    right: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+  .badge-text-full {
+    display: none !important;
+  }
+  .badge-text-compact {
+    display: inline !important;
+  }
+
+  /* Streamlined Metadata Box on Mobile (Reduced by 75% height!) */
+  .comparison-info-bar {
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  .comparison-tech {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 10px;
+    width: 100%;
+  }
+  .tech-spec {
+    gap: 1px;
+  }
+  .tech-spec-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.03em;
+    margin-bottom: 1px;
+  }
+  .tech-spec-value {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.25;
+  }
+  .tech-spec.notes-spec {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+    padding-top: 5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .tech-spec.notes-spec .tech-spec-value {
+    font-size: 0.72rem;
+    color: #AAA;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  /* Skeleton loader on mobile */
+  .skeleton-slider {
+    min-height: 180px;
+  }
+  .skeleton-footer {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding-top: 4px;
+  }
+  .skeleton-footer-block {
+    height: 30px;
+  }
+
+  /* Contact Form on Mobile */
+  .contact-form-wrap {
+    padding: 22px 16px;
+    border-radius: var(--radius-md);
   }
   .form-row-2 {
     grid-template-columns: 1fr;
     gap: 0;
   }
-  .color-grade-showcase {
-    padding: 24px;
+  .form-group {
+    margin-bottom: 16px;
   }
+  .form-control {
+    font-size: 16px; /* Prevents iOS Safari auto-zoom on input tap */
+    padding: 12px 14px;
+  }
+  .btn-submit {
+    padding: 14px;
+    font-size: 0.95rem;
+  }
+
+  /* Footer on Mobile */
   .footer-top, .footer-bottom {
     flex-direction: column;
     text-align: center;
+    gap: 20px;
   }
   .footer-links {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 16px;
+  }
+}
+
+/* --- SMALL MOBILE DEVICES (max-width: 480px) --- */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
+  }
+  .section-title {
+    font-size: 1.55rem;
+  }
+  .color-grade-showcase {
+    padding: 6px 4px;
+    border-radius: 10px;
+  }
+  .color-grade-card {
+    padding: 8px 6px;
+    gap: 6px;
+    border-radius: 8px;
+  }
+  .color-grade-title {
+    font-size: 0.88rem;
+  }
+  .slider-knob {
+    width: 25px;
+    height: 25px;
+  }
+  .slider-knob svg {
+    width: 11px;
+    height: 11px;
+  }
+  .slider-badge {
+    font-size: 0.56rem;
+    padding: 1px 5px;
+    bottom: 5px;
+  }
+  .comparison-info-bar {
+    padding: 6px 8px;
+  }
+  .contact-form-wrap {
+    padding: 16px 12px;
+  }
+  .hero-circle-backdrop {
+    width: 230px;
+    height: 230px;
+  }
+  .hero-portrait-wrap {
+    width: 220px;
   }
 }

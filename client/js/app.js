@@ -506,8 +506,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 </svg>
               </div>
             </div>
-            <div class="slider-badge badge-raw">RAW LOG (S-LOG3)</div>
-            <div class="slider-badge badge-graded">CINEMATIC GRADE</div>
+            <div class="slider-badge badge-raw">
+              <span class="badge-text-full">RAW LOG (S-LOG3)</span>
+              <span class="badge-text-compact">RAW LOG</span>
+            </div>
+            <div class="slider-badge badge-graded">
+              <span class="badge-text-full">CINEMATIC GRADE</span>
+              <span class="badge-text-compact">GRADED</span>
+            </div>
           </div>
 
           <!-- Comparison Metadata Bar -->
@@ -521,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="tech-spec-label">Color Space & Target</span>
                 <span class="tech-spec-value">${escapeHtml(item.colorSpace || 'DaVinci Wide Gamut to Rec.709 2.4')}</span>
               </div>
-              <div class="tech-spec">
+              <div class="tech-spec notes-spec">
                 <span class="tech-spec-label">Look Notes</span>
                 <span class="tech-spec-value">${escapeHtml(item.notes || item.description || 'Custom film print emulation with natural skin tones.')}</span>
               </div>
