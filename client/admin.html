@@ -135,11 +135,93 @@
         <div class="pane-action-header">
           <div>
             <h2 class="admin-pane-title">Video Projects</h2>
-            <p class="admin-pane-desc">Manage video edits, reels, documentary long-forms, and commercial projects.</p>
+            <p class="admin-pane-desc">Upload new video files/photos or paste YouTube embeds to update your portfolio.</p>
           </div>
           <button class="btn btn-primary" onclick="window.openProjectModal()">+ Add New Project</button>
         </div>
 
+        <!-- In-Page Project Upload Card -->
+        <div class="admin-upload-card">
+          <h3 class="upload-card-title">📤 Upload & Publish New Video Project</h3>
+          <p class="upload-card-desc">Pick video and photo files directly from your computer, or paste YouTube/Vimeo embed URLs.</p>
+
+          <form id="inPageProjectForm">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Project Title *</label>
+                <input type="text" id="ipProjTitle" class="form-control" placeholder="e.g. Nike Cinematic Brand Reel" required>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label">Category *</label>
+                  <select id="ipProjCategory" class="form-control" required>
+                    <option value="reels">Reels & Shorts</option>
+                    <option value="commercial">Commercial / YouTube</option>
+                    <option value="color-grading">Color Grading</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Client / Metric Highlight</label>
+                  <input type="text" id="ipProjMetric" class="form-control" placeholder="e.g. 2.4M Views, Brand Launch">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <!-- Video Source -->
+              <div class="form-group">
+                <label class="form-label">Video File or URL *</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="ipProjVideoUrl" class="form-control" placeholder="Paste YouTube link OR click upload ->" required>
+                  <label class="btn btn-outline" style="cursor:pointer; white-space:nowrap; padding:10px 14px; font-size:0.85rem;">
+                    <span>📁 Pick Video</span>
+                    <input type="file" accept="video/mp4,video/webm,video/quicktime" style="display:none;" onchange="window.handleFileUpload(this, 'ipProjVideoUrl', 'ipVideoProgress')">
+                  </label>
+                </div>
+                <div id="ipVideoProgress" style="display:none; font-size:0.8rem; color:var(--accent-orange); margin-top:4px;"></div>
+              </div>
+
+              <!-- Thumbnail Source -->
+              <div class="form-group">
+                <label class="form-label">Thumbnail Photo *</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="ipProjThumbUrl" class="form-control" placeholder="Paste image link OR click upload ->" required>
+                  <label class="btn btn-outline" style="cursor:pointer; white-space:nowrap; padding:10px 14px; font-size:0.85rem;">
+                    <span>📁 Pick Photo</span>
+                    <input type="file" accept="image/*" style="display:none;" onchange="window.handleFileUpload(this, 'ipProjThumbUrl', null, 'ipProjThumbPreview')">
+                  </label>
+                </div>
+                <div id="ipProjThumbPreview" style="margin-top:6px; display:none;">
+                  <img src="" style="width:100px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--accent-orange);">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Tags (comma-separated)</label>
+                <input type="text" id="ipProjTags" class="form-control" placeholder="Reels, Speed Ramping, Sound Design">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Short Description</label>
+                <input type="text" id="ipProjDesc" class="form-control" placeholder="Brief notes on editing style, pacing, or tools used...">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="ipProjFeatured" style="width:18px; height:18px; accent-color:var(--accent-orange);">
+                <label for="ipProjFeatured" style="font-size:0.9rem; cursor:pointer;">Mark as Featured</label>
+              </div>
+              <button type="submit" class="btn btn-primary" id="ipSaveProjectBtn" style="padding:12px 28px;">
+                ⚡ Publish Video Project
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="font-family:var(--font-heading); font-size:1.15rem; margin-bottom:14px;">Existing Projects List</h3>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
@@ -169,6 +251,70 @@
           <button class="btn btn-primary" onclick="window.openColorGradeModal()">+ Add New Comparison</button>
         </div>
 
+        <!-- In-Page Color Grade Upload Card -->
+        <div class="admin-upload-card">
+          <h3 class="upload-card-title">🎨 Upload New Before & After Color Comparison</h3>
+          <p class="upload-card-desc">Upload RAW/LOG and Graded photo files directly from your computer to create an interactive slider comparison.</p>
+
+          <form id="inPageColorGradeForm">
+            <div class="form-group">
+              <label class="form-label">Comparison Title *</label>
+              <input type="text" id="ipColorTitle" class="form-control" placeholder="e.g. Moody Night City - S-Log3 to Rec.709" required>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Before Image (RAW / LOG) *</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="ipColorBeforeUrl" class="form-control" placeholder="Image URL or upload ->" required>
+                  <label class="btn btn-outline" style="cursor:pointer; white-space:nowrap; padding:10px 14px; font-size:0.85rem;">
+                    <span>📁 Pick Photo</span>
+                    <input type="file" accept="image/*" style="display:none;" onchange="window.handleFileUpload(this, 'ipColorBeforeUrl', null, 'ipColorBeforePrev')">
+                  </label>
+                </div>
+                <div id="ipColorBeforePrev" style="margin-top:6px; display:none;">
+                  <img src="" style="width:100px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--border-subtle);">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">After Image (Graded Look) *</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="ipColorAfterUrl" class="form-control" placeholder="Image URL or upload ->" required>
+                  <label class="btn btn-outline" style="cursor:pointer; white-space:nowrap; padding:10px 14px; font-size:0.85rem;">
+                    <span>📁 Pick Photo</span>
+                    <input type="file" accept="image/*" style="display:none;" onchange="window.handleFileUpload(this, 'ipColorAfterUrl', null, 'ipColorAfterPrev')">
+                  </label>
+                </div>
+                <div id="ipColorAfterPrev" style="margin-top:6px; display:none;">
+                  <img src="" style="width:100px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--accent-orange);">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Camera & Sensor Profile</label>
+                <input type="text" id="ipColorCamera" class="form-control" placeholder="e.g. Sony FX3 S-Log3">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Color Space / Transform</label>
+                <input type="text" id="ipColorSpace" class="form-control" placeholder="e.g. ACEScc / DaVinci Wide Gamut">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Look Notes / Emulation</label>
+              <textarea id="ipColorNotes" class="form-control" rows="2" placeholder="Custom print emulation, soft highlights..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="ipSaveColorBtn" style="padding:12px 28px;">
+              ⚡ Add Color Comparison
+            </button>
+          </form>
+        </div>
+
+        <h3 style="font-family:var(--font-heading); font-size:1.15rem; margin-bottom:14px;">Existing Comparisons List</h3>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>

@@ -21,15 +21,13 @@ const CONFIG = {
     } catch (e) {}
 
     const hostname = window.location.hostname;
-    // 2. Local development: use current local origin if running via server, or default to localhost:5050
+    // 2. Local development: ALWAYS point to backend on port 5050
+    // (regardless of whether frontend is opened on port 5500 Live Server, 3000, 5050, or file://)
     if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '') {
-      if (window.location.port) {
-        return window.location.origin;
-      }
       return 'http://localhost:5050';
     }
 
-    // 3. Production: Point to live Render backend
+    // 3. Production on Netlify / Custom Domain: Point to live Render backend
     return 'https://asif-raza-portfolio-api.onrender.com';
   })(),
 

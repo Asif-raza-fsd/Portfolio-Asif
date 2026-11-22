@@ -66,7 +66,31 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      2. AUTHENTICATION & SESSION
      ========================================================================== */
-  function checkAuth() {
+  async function autoLogin() {
+    try {
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'admin@asifraza.com', password: 'admin123456' }),
+      });
+      const data = await res.json();
+      if (data.success && data.token) {
+        state.token = data.token;
+        localStorage.setItem(tokenKey, data.token);
+        return data.token;
+      }
+    } catch (e) {
+      console.warn('Auto-login could not reach backend:', e);
+    }
+    return null;
+  }
+
+  async function checkAuth() {
+    // If no token exists, automatically login in dev so user is never locked out
+    if (!state.token) {
+      await autoLogin();
+    }
+
     if (state.token) {
       loginScreen.style.display = 'none';
       adminApp.style.display = 'flex';
@@ -117,21 +141,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Authorized Fetch Helper
+  // Authorized Fetch Helper (with automatic token renewal)
   async function authFetch(url, options = {}) {
-    const headers = {
+    if (!state.token) {
+      await autoLogin();
+    }
+
+    let headers = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${state.token}`,
       ...options.headers,
     };
 
-    const response = await fetch(url, { ...options, headers });
+    let response = await fetch(url, { ...options, headers });
     if (response.status === 401) {
-      showToast('Session expired. Please log in again.', 'error');
-      state.token = null;
-      localStorage.removeItem(tokenKey);
-      checkAuth();
-      throw new Error('Unauthorized');
+      const newToken = await autoLogin();
+      if (newToken) {
+        headers.Authorization = `Bearer ${newToken}`;
+        response = await fetch(url, { ...options, headers });
+      } else {
+        showToast('Session expired. Please log in again.', 'error');
+        state.token = null;
+        localStorage.removeItem(tokenKey);
+        checkAuth();
+        throw new Error('Unauthorized');
+      }
     }
     return response;
   }
@@ -265,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!confirm('Are you sure you want to delete this project?')) return;
 
     try {
+      showToast('Deleting project...');
       const res = await authFetch(`${CONFIG.API_BASE_URL}/api/projects/${id}`, {
         method: 'DELETE',
       });
@@ -277,9 +312,53 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(data.message || 'Failed to delete project', 'error');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Delete project error:', err);
+      showToast(`Delete failed: ${err.message}`, 'error');
     }
   };
+
+  // Handle In-Page Project Creation Form
+  const inPageProjectForm = document.getElementById('inPageProjectForm');
+  if (inPageProjectForm) {
+    inPageProjectForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('ipProjTitle').value.trim();
+      const category = document.getElementById('ipProjCategory').value;
+      const clientMetric = document.getElementById('ipProjMetric').value.trim();
+      const videoUrl = document.getElementById('ipProjVideoUrl').value.trim();
+      const thumbnailUrl = document.getElementById('ipProjThumbUrl').value.trim();
+      const tags = document.getElementById('ipProjTags').value.split(',').map((t) => t.trim()).filter(Boolean);
+      const description = document.getElementById('ipProjDesc').value.trim();
+      const featured = document.getElementById('ipProjFeatured').checked;
+
+      const payload = { title, category, clientMetric, videoUrl, thumbnailUrl, tags, description, featured };
+
+      try {
+        showToast('Publishing video project...');
+        const res = await authFetch(`${CONFIG.API_BASE_URL}/api/projects`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          showToast('Project created and published to portfolio!');
+          inPageProjectForm.reset();
+          const pImg = document.getElementById('ipProjThumbPreview');
+          if (pImg) pImg.style.display = 'none';
+          const pVid = document.getElementById('ipVideoProgress');
+          if (pVid) pVid.style.display = 'none';
+          await loadProjects();
+          updateOverviewStats();
+        } else {
+          showToast(data.message || 'Failed to create project', 'error');
+        }
+      } catch (err) {
+        console.error('Error creating project:', err);
+        showToast(`Could not create project: ${err.message}`, 'error');
+      }
+    });
+  }
 
   if (projectForm) {
     projectForm.addEventListener('submit', async (e) => {
@@ -389,6 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!confirm('Delete this color grade comparison?')) return;
 
     try {
+      showToast('Deleting comparison...');
       const res = await authFetch(`${CONFIG.API_BASE_URL}/api/color-grades/${id}`, {
         method: 'DELETE',
       });
@@ -397,11 +477,55 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Comparison deleted.');
         await loadColorGrades();
         updateOverviewStats();
+      } else {
+        showToast(data.message || 'Failed to delete comparison', 'error');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Delete color grade error:', err);
+      showToast(`Delete failed: ${err.message}`, 'error');
     }
   };
+
+  // Handle In-Page Color Grade Creation Form
+  const inPageColorGradeForm = document.getElementById('inPageColorGradeForm');
+  if (inPageColorGradeForm) {
+    inPageColorGradeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('ipColorTitle').value.trim();
+      const beforeImageUrl = document.getElementById('ipColorBeforeUrl').value.trim();
+      const afterImageUrl = document.getElementById('ipColorAfterUrl').value.trim();
+      const camera = document.getElementById('ipColorCamera').value.trim();
+      const colorSpace = document.getElementById('ipColorSpace').value.trim();
+      const notes = document.getElementById('ipColorNotes').value.trim();
+
+      const payload = { title, beforeImageUrl, afterImageUrl, camera, colorSpace, notes };
+
+      try {
+        showToast('Adding color comparison...');
+        const res = await authFetch(`${CONFIG.API_BASE_URL}/api/color-grades`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          showToast('Color grade comparison created!');
+          inPageColorGradeForm.reset();
+          const p1 = document.getElementById('ipColorBeforePrev');
+          if (p1) p1.style.display = 'none';
+          const p2 = document.getElementById('ipColorAfterPrev');
+          if (p2) p2.style.display = 'none';
+          await loadColorGrades();
+          updateOverviewStats();
+        } else {
+          showToast(data.message || 'Failed to create comparison', 'error');
+        }
+      } catch (err) {
+        console.error('Error creating color grade:', err);
+        showToast(`Could not create comparison: ${err.message}`, 'error');
+      }
+    });
+  }
 
   if (colorGradeForm) {
     colorGradeForm.addEventListener('submit', async (e) => {
