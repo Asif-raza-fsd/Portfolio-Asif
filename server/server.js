@@ -19,7 +19,8 @@ const PORT = process.env.PORT || 5000;
 // Security & Parsing Middlewares
 app.use(
   helmet({
-    crossOriginResourcePolicy: false, // allows serving assets/images cross-origin
+    contentSecurityPolicy: false, // Allows inline onclick/onchange handlers, iframes (YouTube/Vimeo), and external fonts
+    crossOriginResourcePolicy: false, // Allows serving assets/images cross-origin
   })
 );
 

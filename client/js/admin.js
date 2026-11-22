@@ -86,18 +86,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function checkAuth() {
-    // If no token exists, automatically login in dev so user is never locked out
+    // 1. Verify existing token if present
+    if (state.token) {
+      try {
+        const verifyRes = await fetch(`${CONFIG.API_BASE_URL}/api/auth/me?_t=${Date.now()}`, {
+          headers: { Authorization: `Bearer ${state.token}` },
+        });
+        if (!verifyRes.ok) {
+          state.token = null;
+          localStorage.removeItem(tokenKey);
+        }
+      } catch (e) {
+        console.warn('Token verify check error:', e);
+      }
+    }
+
+    // 2. If no valid token, autoLogin
     if (!state.token) {
       await autoLogin();
     }
 
+    // 3. Render dashboard or login screen
     if (state.token) {
-      loginScreen.style.display = 'none';
-      adminApp.style.display = 'flex';
+      if (loginScreen) loginScreen.style.display = 'none';
+      if (adminApp) adminApp.style.display = 'flex';
       loadAllAdminData();
     } else {
-      loginScreen.style.display = 'flex';
-      adminApp.style.display = 'none';
+      if (loginScreen) loginScreen.style.display = 'flex';
+      if (adminApp) adminApp.style.display = 'none';
     }
   }
 
@@ -204,13 +220,17 @@ document.addEventListener('DOMContentLoaded', () => {
      4. LOAD ALL DASHBOARD DATA
      ========================================================================== */
   async function loadAllAdminData() {
-    await Promise.all([
-      loadProjects(),
-      loadColorGrades(),
-      loadSettings(),
-      loadInquiries(),
-    ]);
-    updateOverviewStats();
+    try {
+      await Promise.allSettled([
+        loadProjects(),
+        loadColorGrades(),
+        loadSettings(),
+        loadInquiries(),
+      ]);
+      updateOverviewStats();
+    } catch (e) {
+      console.error('Error loading admin data:', e);
+    }
   }
 
   function updateOverviewStats() {
@@ -261,13 +281,29 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${escapeHtml(p.clientMetric || '—')}</td>
         <td>${p.featured ? '⭐ Yes' : 'No'}</td>
         <td>
-          <button class="btn-action btn-action-edit" onclick="window.editProject('${p._id}')">Edit</button>
-          <button class="btn-action btn-action-delete" onclick="window.deleteProject('${p._id}')">Delete</button>
+          <button class="btn-action btn-action-edit" data-id="${p._id}" onclick="window.editProject('${p._id}')">Edit</button>
+          <button class="btn-action btn-action-delete" data-id="${p._id}" onclick="window.deleteProject('${p._id}')">Delete</button>
         </td>
       </tr>
     `
       )
       .join('');
+  }
+
+  // Delegated click handler for projects table
+  if (projectsTableBody) {
+    projectsTableBody.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.btn-action-edit');
+      if (editBtn && editBtn.dataset.id) {
+        window.editProject(editBtn.dataset.id);
+        return;
+      }
+      const delBtn = e.target.closest('.btn-action-delete');
+      if (delBtn && delBtn.dataset.id) {
+        window.deleteProject(delBtn.dataset.id);
+        return;
+      }
+    });
   }
 
   window.openProjectModal = function () {
@@ -545,13 +581,29 @@ document.addEventListener('DOMContentLoaded', () => {
         <td><img src="${escapeHtml(c.beforeImageUrl)}" class="table-thumb" alt="RAW"></td>
         <td><img src="${escapeHtml(c.afterImageUrl)}" class="table-thumb" alt="Graded"></td>
         <td>
-          <button class="btn-action btn-action-edit" onclick="window.editColorGrade('${c._id}')">Edit</button>
-          <button class="btn-action btn-action-delete" onclick="window.deleteColorGrade('${c._id}')">Delete</button>
+          <button class="btn-action btn-action-edit" data-id="${c._id}" onclick="window.editColorGrade('${c._id}')">Edit</button>
+          <button class="btn-action btn-action-delete" data-id="${c._id}" onclick="window.deleteColorGrade('${c._id}')">Delete</button>
         </td>
       </tr>
     `
       )
       .join('');
+  }
+
+  // Delegated click handler for color grades table
+  if (colorGradesTableBody) {
+    colorGradesTableBody.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.btn-action-edit');
+      if (editBtn && editBtn.dataset.id) {
+        window.editColorGrade(editBtn.dataset.id);
+        return;
+      }
+      const delBtn = e.target.closest('.btn-action-delete');
+      if (delBtn && delBtn.dataset.id) {
+        window.deleteColorGrade(delBtn.dataset.id);
+        return;
+      }
+    });
   }
 
   window.openColorGradeModal = function () {
