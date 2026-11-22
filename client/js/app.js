@@ -407,16 +407,12 @@ document.addEventListener('DOMContentLoaded', () => {
     listEl.innerHTML = state.colorGrades.map((item, idx) => {
       return `
         <div class="color-grade-card" data-index="${idx}">
-          <!-- Comparison Header with Title and Mode Toggle -->
+          <!-- Comparison Header with Title -->
           <div class="color-grade-header">
             <div class="color-grade-title-wrap">
               <h3 class="color-grade-title">${escapeHtml(item.title || `Cinematic Look #${idx + 1}`)}</h3>
               ${item.camera ? `<span class="color-grade-badge">${escapeHtml(item.camera)}</span>` : ''}
               ${item.colorSpace ? `<span class="color-grade-badge color-grade-badge-muted">${escapeHtml(item.colorSpace)}</span>` : ''}
-            </div>
-            <div class="view-mode-toggle">
-              <button type="button" class="mode-btn active" onclick="window.toggleGradeView(${idx}, 'slider')" id="btnSlider-${idx}">↔ Split Slider</button>
-              <button type="button" class="mode-btn" onclick="window.toggleGradeView(${idx}, 'side')" id="btnSide-${idx}">⊞ Side-by-Side</button>
             </div>
           </div>
 
@@ -436,24 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="slider-badge badge-raw">RAW LOG (S-LOG3)</div>
             <div class="slider-badge badge-graded">CINEMATIC GRADE</div>
-          </div>
-
-          <!-- Side-by-Side View (Full frames with zero cropping) -->
-          <div class="side-by-side-container" id="gradeSide-${idx}" style="display:none;">
-            <div class="side-col">
-              <div class="side-col-media">
-                <img src="${escapeHtml(item.beforeImageUrl)}" alt="Raw LOG Camera Sensor" class="side-img" loading="lazy">
-                <span class="slider-badge badge-raw">RAW LOG</span>
-              </div>
-              <span class="side-col-label">Camera Sensor Uncorrected</span>
-            </div>
-            <div class="side-col">
-              <div class="side-col-media">
-                <img src="${escapeHtml(item.afterImageUrl)}" alt="Final Graded Look" class="side-img" loading="lazy">
-                <span class="slider-badge badge-graded">FINAL GRADE</span>
-              </div>
-              <span class="side-col-label">Rec.709 Graded Delivery</span>
-            </div>
           </div>
 
           <!-- Comparison Metadata Bar -->
@@ -552,32 +530,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', syncWidths);
     setTimeout(syncWidths, 300);
   }
-
-  window.toggleGradeView = function(idx, mode) {
-    const sliderEl = document.getElementById(`gradeSlider-${idx}`);
-    const sideEl = document.getElementById(`gradeSide-${idx}`);
-    const btnSlider = document.getElementById(`btnSlider-${idx}`);
-    const btnSide = document.getElementById(`btnSide-${idx}`);
-
-    if (mode === 'side') {
-      if (sliderEl) sliderEl.style.display = 'none';
-      if (sideEl) sideEl.style.display = 'grid';
-      if (btnSlider) btnSlider.classList.remove('active');
-      if (btnSide) btnSide.classList.add('active');
-    } else {
-      if (sliderEl) {
-        sliderEl.style.display = 'block';
-        const beforeImg = sliderEl.querySelector('.image-before');
-        if (beforeImg) {
-          beforeImg.style.width = `${sliderEl.offsetWidth}px`;
-          beforeImg.style.height = `${sliderEl.offsetHeight}px`;
-        }
-      }
-      if (sideEl) sideEl.style.display = 'none';
-      if (btnSlider) btnSlider.classList.add('active');
-      if (btnSide) btnSide.classList.remove('active');
-    }
-  };
 
   /* ==========================================================================
      7. CONTACT INQUIRY FORM SUBMISSION
