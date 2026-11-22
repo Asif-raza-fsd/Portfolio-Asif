@@ -378,18 +378,93 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      6. BEFORE & AFTER COLOR GRADING SHOWCASE (Downwise for All Looks)
      ========================================================================== */
+  const COLOR_GRADES_CACHE_KEY = 'asif_cached_color_grades_v2';
+
+  function renderColorGradesSkeleton() {
+    const listEl = document.getElementById('colorGradesList');
+    if (!listEl) return;
+    listEl.innerHTML = `
+      <div class="color-grade-card color-grade-skeleton">
+        <div class="skeleton-header">
+          <div class="skeleton-shimmer skeleton-title-pill"></div>
+          <div class="skeleton-shimmer skeleton-badge-pill"></div>
+        </div>
+        <div class="skeleton-slider skeleton-shimmer">
+          <div class="skeleton-loader-content">
+            <div class="skeleton-spinner"></div>
+            <span>Loading Cinematic Color Looks...</span>
+          </div>
+        </div>
+        <div class="skeleton-footer">
+          <div class="skeleton-shimmer skeleton-footer-block"></div>
+          <div class="skeleton-shimmer skeleton-footer-block"></div>
+          <div class="skeleton-shimmer skeleton-footer-block"></div>
+        </div>
+      </div>
+    `;
+  }
+
   async function loadColorGrades() {
+    const listEl = document.getElementById('colorGradesList');
+
+    // 1. Instant Cache Render (0ms Perception!)
+    try {
+      const cached = localStorage.getItem(COLOR_GRADES_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          state.colorGrades = parsed;
+          renderAllColorGrades();
+        }
+      }
+    } catch (e) {
+      console.warn('Cache read notice:', e);
+    }
+
+    // 2. If nothing rendered yet, display skeleton placeholder
+    if (!state.colorGrades || state.colorGrades.length === 0) {
+      renderColorGradesSkeleton();
+    }
+
+    // 3. Background fetch from server
     try {
       const res = await fetch(`${CONFIG.API_BASE_URL}/api/color-grades?_t=${Date.now()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-        state.colorGrades = data.data;
-        renderAllColorGrades();
+        const newJson = JSON.stringify(data.data);
+        const oldJson = JSON.stringify(state.colorGrades || []);
+        if (newJson !== oldJson) {
+          state.colorGrades = data.data;
+          renderAllColorGrades();
+          try {
+            localStorage.setItem(COLOR_GRADES_CACHE_KEY, newJson);
+          } catch (storageErr) {
+            console.warn('LocalStorage quota notice:', storageErr);
+          }
+        }
       }
     } catch (err) {
-      console.warn('Could not fetch color grades:', err);
+      console.warn('Could not fetch color grades from server:', err);
+      if (!state.colorGrades || state.colorGrades.length === 0) {
+        if (listEl) {
+          listEl.innerHTML = `
+            <div style="text-align:center; padding:40px 20px; color:var(--text-secondary); background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed var(--border-color);">
+              <p style="margin-bottom:12px;">Could not connect to color grade showcase.</p>
+              <button onclick="window.retryLoadColorGrades()" class="btn-primary" style="padding:8px 20px; font-size:0.85rem;">
+                ↻ Retry Loading
+              </button>
+            </div>
+          `;
+        }
+      }
     }
   }
+
+  window.retryLoadColorGrades = function () {
+    renderColorGradesSkeleton();
+    loadColorGrades();
+  };
 
   function renderAllColorGrades() {
     const listEl = document.getElementById('colorGradesList');
@@ -405,6 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     listEl.innerHTML = state.colorGrades.map((item, idx) => {
+      const isFirst = idx === 0;
       return `
         <div class="color-grade-card" data-index="${idx}">
           <!-- Comparison Header with Title -->
@@ -418,9 +494,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <!-- Interactive Slider View (Natural Height with Zero Cropping) -->
           <div class="slider-container" id="gradeSlider-${idx}" aria-label="Before and after color grade comparison for ${escapeHtml(item.title)}">
-            <img src="${escapeHtml(item.afterImageUrl)}" alt="Graded Look" class="slider-image image-after" loading="lazy">
+            <img src="${escapeHtml(item.afterImageUrl)}" alt="Graded Look" class="slider-image image-after" ${isFirst ? 'fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"'}>
             <div class="image-before-wrap">
-              <img src="${escapeHtml(item.beforeImageUrl)}" alt="Raw LOG Footage" class="image-before" loading="lazy">
+              <img src="${escapeHtml(item.beforeImageUrl)}" alt="Raw LOG Footage" class="image-before" ${isFirst ? 'fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"'}>
             </div>
             <div class="slider-handle">
               <div class="slider-knob">

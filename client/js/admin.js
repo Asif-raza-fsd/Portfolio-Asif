@@ -1155,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', () => {
      9. DIRECT FILE UPLOADS (PHOTOS & VIDEOS)
      ========================================================================== */
   // Helper: Client-side image optimizer to keep memory and transfer snappy
-  function optimizeImage(file, maxDimension = 1920, quality = 0.85) {
+  function optimizeImage(file, maxDimension = 1280, quality = 0.72) {
     return new Promise((resolve) => {
       if (!file.type || !file.type.startsWith('image/')) {
         return resolve(null);
@@ -1199,13 +1199,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (progressEl) {
       progressEl.style.display = 'block';
-      progressEl.textContent = `Processing ${file.name}...`;
+      progressEl.textContent = `Optimizing ${file.name}...`;
     }
 
-    // 1. Instant client-side optimized preview & fallback
+    // 1. Instant client-side optimized HD preview & storage
+    let hasOptimizedImage = false;
     if (file.type && file.type.startsWith('image/')) {
-      const optimizedDataUrl = await optimizeImage(file);
+      const optimizedDataUrl = await optimizeImage(file, 1280, 0.72);
       if (optimizedDataUrl) {
+        hasOptimizedImage = true;
         if (targetInput) {
           targetInput.value = optimizedDataUrl;
           targetInput.dataset.isAuto = 'false';
@@ -1215,14 +1217,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const img = previewEl.querySelector('img');
           if (img) img.src = optimizedDataUrl;
         }
-        showToast(`✓ Photo "${file.name}" ready!`);
+        showToast(`✓ Photo "${file.name}" optimized (fast web HD)!`);
         if (progressEl) {
           progressEl.textContent = `✓ Photo ready (optimized HD)`;
         }
       }
     }
 
-    // 2. Upload file to server in background to get permanent hosted URL
+    // 2. Upload file to server in background for video or PDF hosted URL
     const formData = new FormData();
     formData.append('file', file);
 
@@ -1237,9 +1239,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (res.ok) {
         const data = await res.json();
-        if (data.success && data.url) {
-          if (targetInput) {
-            targetInput.value = data.url;
+        if (data.success) {
+          // Only overwrite targetInput if it was not an image (e.g. video or PDF)
+          if (!hasOptimizedImage && targetInput) {
+            targetInput.value = data.url || data.fileUrl;
             targetInput.dataset.isAuto = 'false';
           }
           if (progressEl) {

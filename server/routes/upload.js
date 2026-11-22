@@ -66,22 +66,11 @@ router.post('/', authMiddleware, upload.single('file'), (req, res) => {
     const isHttps = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' || host.includes('onrender.com');
     const fullUrl = `${isHttps ? 'https' : 'http'}://${host}/uploads/${req.file.filename}`;
 
-    let dataUrl = null;
-    if (req.file.mimetype.startsWith('image/') && req.file.size <= 10 * 1024 * 1024) {
-      try {
-        const fileBuf = fs.readFileSync(req.file.path);
-        dataUrl = `data:${req.file.mimetype};base64,${fileBuf.toString('base64')}`;
-      } catch (e) {
-        console.warn('Could not generate dataUrl:', e);
-      }
-    }
-
     res.json({
       success: true,
       message: 'File uploaded successfully!',
-      url: dataUrl || fullUrl,
+      url: fullUrl,
       fileUrl: fullUrl,
-      dataUrl: dataUrl,
       filename: req.file.filename,
       originalName: req.file.originalname,
       size: req.file.size,

@@ -4,6 +4,7 @@ const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const { connectDB } = require('./config/db');
 
 // Import routes
@@ -18,6 +19,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security & Parsing Middlewares
+app.use(compression());
 app.use(
   helmet({
     contentSecurityPolicy: false, // Allows inline onclick/onchange handlers, iframes (YouTube/Vimeo), and external fonts
