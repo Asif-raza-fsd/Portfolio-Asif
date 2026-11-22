@@ -4,31 +4,33 @@
    ========================================================================== */
 
 :root {
-  /* Color Palette — Premium Cinema Obsidian & Studio Charcoal */
-  --bg-primary: #0D0E12;
-  --bg-card: #15171F;
-  --bg-card-alt: #1A1D27;
-  --bg-card-hover: #1F232F;
-  --bg-circle-backdrop: #13151D;
+  /* Color Palette — Cinema Obsidian & Brushed Titanium */
+  --bg-primary: #0A0B0E;
+  --bg-card: #12141A;
+  --bg-card-alt: #171922;
+  --bg-card-hover: #1E212B;
+  --bg-circle-backdrop: #111318;
 
-  /* Orange Accent & Gradients — Warm Cinematic Amber */
-  --accent-orange: #FF7020;
-  --accent-orange-dark: #E65100;
-  --accent-gradient: linear-gradient(135deg, #FF7B29 0%, #EA580C 100%);
-  --accent-gradient-hover: linear-gradient(135deg, #FF8D42 0%, #F97316 100%);
-  --accent-glow: rgba(255, 112, 32, 0.22);
-  --accent-subtle: rgba(255, 112, 32, 0.08);
+  /* Primary Accent & Gradients — Luminous Champagne Gold & Warm Amber Bronze */
+  --accent-gold: #E5B574;
+  --accent-gold-dark: #C49045;
+  --accent-orange: #E5B574; /* Alias ensuring total system-wide consistency */
+  --accent-orange-dark: #C49045;
+  --accent-gradient: linear-gradient(135deg, #F3C68F 0%, #D4A362 50%, #B8803B 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #FAD7A0 0%, #E0B070 50%, #C99045 100%);
+  --accent-glow: rgba(229, 181, 116, 0.24);
+  --accent-subtle: rgba(229, 181, 116, 0.08);
 
   /* Typography Colors — Crisp, Soothing & High Legibility */
-  --text-primary: #F8F9FA;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
+  --text-primary: #F9FAFB;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
 
   /* Borders & Dividers */
-  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.06);
   --border-light: rgba(255, 255, 255, 0.12);
   --border-card: rgba(255, 255, 255, 0.08);
-  --border-card-hover: rgba(255, 112, 32, 0.35);
+  --border-card-hover: rgba(229, 181, 116, 0.4);
 
   /* Fonts */
   --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -163,14 +165,16 @@ img, svg {
 
 .btn-primary {
   background: var(--accent-gradient);
-  color: #FFFFFF;
+  color: #0A0B0E;
+  font-weight: 700;
   box-shadow: 0 4px 18px var(--accent-glow);
 }
 
 .btn-primary:hover {
   background: var(--accent-gradient-hover);
+  color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(253, 111, 0, 0.45);
+  box-shadow: 0 8px 24px rgba(229, 181, 116, 0.45);
 }
 
 .btn-outline {
@@ -325,7 +329,7 @@ img, svg {
   left: 5%;
   width: 480px;
   height: 480px;
-  background: radial-gradient(circle, rgba(253, 111, 0, 0.08) 0%, rgba(18, 18, 18, 0) 70%);
+  background: radial-gradient(circle, rgba(229, 181, 116, 0.08) 0%, rgba(10, 11, 14, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -472,7 +476,7 @@ img, svg {
   width: 460px;
   height: 460px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 112, 32, 0.08) 0%, rgba(20, 22, 30, 0.6) 60%, transparent 75%);
+  background: radial-gradient(circle, rgba(229, 181, 116, 0.08) 0%, rgba(20, 22, 30, 0.6) 60%, transparent 75%);
   pointer-events: none;
   z-index: 0;
 }
@@ -557,7 +561,7 @@ img, svg {
   border-color: var(--accent-orange);
   background: var(--bg-card-hover);
   transform: translateY(-6px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 20px rgba(253, 111, 0, 0.15);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow);
 }
 
 .service-card:hover::before {
@@ -568,8 +572,8 @@ img, svg {
   width: 56px;
   height: 56px;
   border-radius: var(--radius-sm);
-  background: rgba(253, 111, 0, 0.1);
-  border: 1px solid rgba(253, 111, 0, 0.25);
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-glow);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -651,7 +655,7 @@ img, svg {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(253, 111, 0, 0.12);
+  background: var(--accent-subtle);
   border: 1px solid var(--accent-orange);
   border-radius: var(--radius-full);
   padding: 6px 14px;
@@ -785,7 +789,8 @@ img, svg {
 
 .filter-tab.active {
   background: var(--accent-gradient);
-  color: #FFFFFF;
+  color: #0A0B0E;
+  font-weight: 700;
   border-color: transparent;
   box-shadow: 0 4px 16px var(--accent-glow);
 }
@@ -857,8 +862,8 @@ img, svg {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFFFFF;
-  box-shadow: 0 0 25px rgba(253, 111, 0, 0.6);
+  color: #0A0B0E;
+  box-shadow: 0 0 25px var(--accent-glow);
   transform: scale(0.85);
   transition: transform var(--transition-fast);
 }
@@ -1018,12 +1023,12 @@ img, svg {
   height: 44px;
   border-radius: 50%;
   background: var(--accent-gradient);
-  border: 3px solid #FFFFFF;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.8), 0 0 20px rgba(253, 111, 0, 0.7);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.8), 0 0 20px var(--accent-glow);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFFFFF;
+  color: #0A0B0E;
 }
 
 .slider-knob svg {
@@ -1054,8 +1059,9 @@ img, svg {
 
 .badge-graded {
   right: 18px;
-  background: rgba(253, 111, 0, 0.9);
-  color: #FFFFFF;
+  background: var(--accent-gradient);
+  color: #0A0B0E;
+  font-weight: 700;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
@@ -1172,7 +1178,7 @@ img, svg {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(253, 111, 0, 0.12);
+  background: var(--accent-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1235,7 +1241,7 @@ img, svg {
 .form-control:focus {
   outline: none;
   border-color: var(--accent-orange);
-  box-shadow: 0 0 0 3px rgba(253, 111, 0, 0.2);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 textarea.form-control {

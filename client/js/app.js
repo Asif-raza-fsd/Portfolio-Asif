@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toast = document.createElement('div');
     toast.className = `toast ${type === 'error' ? 'toast-error' : ''}`;
     toast.innerHTML = `
-      <div style="color:${type === 'error' ? '#E74C3C' : '#FD6F00'}; font-size:18px; line-height:1;">
+      <div style="color:${type === 'error' ? '#E74C3C' : '#E5B574'}; font-size:18px; line-height:1;">
         ${type === 'error' ? '⚠️' : '✓'}
       </div>
       <div class="toast-message">${message}</div>

@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toast = document.createElement('div');
     toast.className = `toast ${type === 'error' ? 'toast-error' : ''}`;
     toast.innerHTML = `
-      <div style="color:${type === 'error' ? '#E74C3C' : '#FD6F00'}; font-size:18px; line-height:1;">
+      <div style="color:${type === 'error' ? '#E74C3C' : '#E5B574'}; font-size:18px; line-height:1;">
         ${type === 'error' ? '⚠️' : '✓'}
       </div>
       <div class="toast-message">${message}</div>
@@ -86,27 +86,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function checkAuth() {
-    // 1. Verify existing token if present
-    if (state.token) {
-      try {
-        const verifyRes = await fetch(`${CONFIG.API_BASE_URL}/api/auth/me?_t=${Date.now()}`, {
-          headers: { Authorization: `Bearer ${state.token}` },
-        });
-        if (!verifyRes.ok) {
-          state.token = null;
-          localStorage.removeItem(tokenKey);
-        }
-      } catch (e) {
-        console.warn('Token verify check error:', e);
+    const isExplicitlyLoggedOut = localStorage.getItem('asif_portfolio_logged_out') === 'true';
+
+    // If explicitly logged out or no token stored, present login screen
+    if (isExplicitlyLoggedOut || !state.token) {
+      state.token = null;
+      if (loginScreen) loginScreen.style.display = 'flex';
+      if (adminApp) adminApp.style.display = 'none';
+      return;
+    }
+
+    // Verify existing token
+    try {
+      const verifyRes = await fetch(`${CONFIG.API_BASE_URL}/api/auth/me?_t=${Date.now()}`, {
+        headers: { Authorization: `Bearer ${state.token}` },
+      });
+      if (!verifyRes.ok) {
+        state.token = null;
+        localStorage.removeItem(tokenKey);
+        if (loginScreen) loginScreen.style.display = 'flex';
+        if (adminApp) adminApp.style.display = 'none';
+        return;
       }
+    } catch (e) {
+      console.warn('Token verify check error:', e);
     }
 
-    // 2. If no valid token, autoLogin
-    if (!state.token) {
-      await autoLogin();
-    }
-
-    // 3. Render dashboard or login screen
+    // Render dashboard if authenticated
     if (state.token) {
       if (loginScreen) loginScreen.style.display = 'none';
       if (adminApp) adminApp.style.display = 'flex';
@@ -135,8 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.success && data.token) {
           state.token = data.token;
           localStorage.setItem(tokenKey, data.token);
+          localStorage.removeItem('asif_portfolio_logged_out');
           showToast('Welcome back, Asif Raza! Logged in successfully.');
-          checkAuth();
+          if (loginScreen) loginScreen.style.display = 'none';
+          if (adminApp) adminApp.style.display = 'flex';
+          loadAllAdminData();
         } else {
           showToast(data.message || 'Invalid email or password.', 'error');
         }
@@ -149,17 +158,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle Logout
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       state.token = null;
       localStorage.removeItem(tokenKey);
+      localStorage.setItem('asif_portfolio_logged_out', 'true');
       showToast('Logged out successfully.');
-      checkAuth();
+      if (loginScreen) loginScreen.style.display = 'flex';
+      if (adminApp) adminApp.style.display = 'none';
     });
   }
 
   // Authorized Fetch Helper (with automatic token renewal)
   async function authFetch(url, options = {}) {
-    if (!state.token) {
+    if (!state.token && localStorage.getItem('asif_portfolio_logged_out') !== 'true') {
       await autoLogin();
     }
 
@@ -171,10 +183,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let response = await fetch(url, { ...options, headers });
     if (response.status === 401) {
-      const newToken = await autoLogin();
-      if (newToken) {
-        headers.Authorization = `Bearer ${newToken}`;
-        response = await fetch(url, { ...options, headers });
+      if (localStorage.getItem('asif_portfolio_logged_out') !== 'true') {
+        const newToken = await autoLogin();
+        if (newToken) {
+          headers.Authorization = `Bearer ${newToken}`;
+          response = await fetch(url, { ...options, headers });
+        } else {
+          showToast('Session expired. Please log in again.', 'error');
+          state.token = null;
+          localStorage.removeItem(tokenKey);
+          localStorage.setItem('asif_portfolio_logged_out', 'true');
+          checkAuth();
+          throw new Error('Unauthorized');
+        }
       } else {
         showToast('Session expired. Please log in again.', 'error');
         state.token = null;
@@ -359,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (card) {
         card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         card.style.outline = '2px solid var(--accent-orange)';
-        card.style.boxShadow = '0 0 24px rgba(253, 111, 0, 0.4)';
+        card.style.boxShadow = '0 0 24px var(--accent-glow)';
       }
 
       showToast(`Loaded "${proj.title}" for editing.`);
@@ -663,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (card) {
         card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         card.style.outline = '2px solid var(--accent-orange)';
-        card.style.boxShadow = '0 0 24px rgba(253, 111, 0, 0.4)';
+        card.style.boxShadow = '0 0 24px var(--accent-glow)';
       }
 
       showToast(`Loaded "${item.title}" for editing.`);
