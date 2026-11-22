@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     activeComparisonIndex: 0,
   };
 
+  // Pre-warm Render backend on initial site visit so API is hot
+  try {
+    fetch(`${CONFIG.API_BASE_URL}/api/health`, { mode: 'cors' }).catch(() => {});
+  } catch (e) {}
+
   // DOM Elements
   const navbar = document.getElementById('navbar');
   const mobileToggle = document.getElementById('mobileToggle');
@@ -120,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Active Nav Link Spy on Scroll
   function updateActiveNavLink() {
-    const sections = ['home', 'services', 'about', 'portfolio', 'contact'];
+    const sections = ['home', 'portfolio', 'services', 'about', 'contact'];
     const scrollPos = window.scrollY + 140;
 
     for (let i = sections.length - 1; i >= 0; i--) {

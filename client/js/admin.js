@@ -6,6 +6,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tokenKey = 'asif_portfolio_admin_jwt';
 
+  // Pre-warm Render backend on admin portal load
+  try {
+    fetch(`${CONFIG.API_BASE_URL}/api/health`, { mode: 'cors' }).catch(() => {});
+  } catch (e) {}
+
   // State
   const state = {
     token: localStorage.getItem(tokenKey) || null,
@@ -129,29 +134,66 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
+      const submitBtn = document.getElementById('loginSubmitBtn');
+      const origBtnHtml = submitBtn ? submitBtn.innerHTML : 'Authenticate & Access Dashboard';
 
-      try {
-        const res = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="login-spinner"></span> Connecting & Authenticating...';
+      }
 
-        const data = await res.json();
-        if (data.success && data.token) {
-          state.token = data.token;
-          localStorage.setItem(tokenKey, data.token);
-          localStorage.removeItem('asif_portfolio_logged_out');
-          showToast('Welcome back, Asif Raza! Logged in successfully.');
-          if (loginScreen) loginScreen.style.display = 'none';
-          if (adminApp) adminApp.style.display = 'flex';
-          loadAllAdminData();
-        } else {
-          showToast(data.message || 'Invalid email or password.', 'error');
+      const maxAttempts = 3;
+      let lastError = null;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          if (attempt > 1 && submitBtn) {
+            submitBtn.innerHTML = `<span class="login-spinner"></span> Server waking up, retrying (${attempt}/${maxAttempts})...`;
+          }
+
+          const res = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await res.json();
+          if (data.success && data.token) {
+            state.token = data.token;
+            localStorage.setItem(tokenKey, data.token);
+            localStorage.removeItem('asif_portfolio_logged_out');
+            showToast('Welcome back, Asif Raza! Logged in successfully.');
+            if (loginScreen) loginScreen.style.display = 'none';
+            if (adminApp) adminApp.style.display = 'flex';
+            loadAllAdminData();
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = origBtnHtml;
+            }
+            return;
+          } else {
+            // Credentials or business logic error, don't retry
+            showToast(data.message || 'Invalid email or password.', 'error');
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = origBtnHtml;
+            }
+            return;
+          }
+        } catch (err) {
+          console.warn(`Login attempt ${attempt} failed:`, err);
+          lastError = err;
+          if (attempt < maxAttempts) {
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+          }
         }
-      } catch (err) {
-        console.error('Login error:', err);
-        showToast('Connection error: Failed to reach backend server.', 'error');
+      }
+
+      console.error('All login attempts failed:', lastError);
+      showToast('Backend server is waking up. Please wait 10 seconds and try again.', 'error');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origBtnHtml;
       }
     });
   }
