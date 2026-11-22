@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   async function loadSettings() {
     try {
-      const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings`);
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings?_t=${Date.now()}`);
       const data = await res.json();
       if (data.success && data.data) {
         state.settings = data.data;
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   async function loadProjects() {
     try {
-      const res = await fetch(`${CONFIG.API_BASE_URL}/api/projects`);
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/projects?_t=${Date.now()}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         state.projects = data.data;
@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   async function loadColorGrades() {
     try {
-      const res = await fetch(`${CONFIG.API_BASE_URL}/api/color-grades`);
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/color-grades?_t=${Date.now()}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         state.colorGrades = data.data;

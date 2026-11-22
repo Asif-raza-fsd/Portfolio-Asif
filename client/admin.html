@@ -141,9 +141,9 @@
         </div>
 
         <!-- In-Page Project Upload Card -->
-        <div class="admin-upload-card">
-          <h3 class="upload-card-title">📤 Upload & Publish New Video Project</h3>
-          <p class="upload-card-desc">Pick video and photo files directly from your computer, or paste YouTube/Vimeo embed URLs.</p>
+        <div class="admin-upload-card" id="projectUploadCard">
+          <h3 class="upload-card-title" id="ipProjCardTitle">📤 Upload & Publish New Video Project</h3>
+          <p class="upload-card-desc" id="ipProjCardDesc">Pick video and photo files directly from your computer, or paste YouTube/Vimeo embed URLs.</p>
 
           <form id="inPageProjectForm">
             <div class="form-row-2">
@@ -209,14 +209,19 @@
               </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; flex-wrap:wrap; gap:12px;">
               <div style="display:flex; align-items:center; gap:8px;">
                 <input type="checkbox" id="ipProjFeatured" style="width:18px; height:18px; accent-color:var(--accent-orange);">
                 <label for="ipProjFeatured" style="font-size:0.9rem; cursor:pointer;">Mark as Featured</label>
               </div>
-              <button type="submit" class="btn btn-primary" id="ipSaveProjectBtn" style="padding:12px 28px;">
-                ⚡ Publish Video Project
-              </button>
+              <div style="display:flex; gap:10px;">
+                <button type="button" class="btn btn-outline" id="ipCancelProjectEditBtn" style="display:none; padding:12px 20px;" onclick="window.cancelProjectEdit()">
+                  ✕ Cancel Edit
+                </button>
+                <button type="submit" class="btn btn-primary" id="ipSaveProjectBtn" style="padding:12px 28px;">
+                  ⚡ Publish Video Project
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -252,9 +257,9 @@
         </div>
 
         <!-- In-Page Color Grade Upload Card -->
-        <div class="admin-upload-card">
-          <h3 class="upload-card-title">🎨 Upload New Before & After Color Comparison</h3>
-          <p class="upload-card-desc">Upload RAW/LOG and Graded photo files directly from your computer to create an interactive slider comparison.</p>
+        <div class="admin-upload-card" id="colorUploadCard">
+          <h3 class="upload-card-title" id="ipColorCardTitle">🎨 Upload New Before & After Color Comparison</h3>
+          <p class="upload-card-desc" id="ipColorCardDesc">Upload RAW/LOG and Graded photo files directly from your computer to create an interactive slider comparison.</p>
 
           <form id="inPageColorGradeForm">
             <div class="form-group">
@@ -308,9 +313,14 @@
               <textarea id="ipColorNotes" class="form-control" rows="2" placeholder="Custom print emulation, soft highlights..."></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="ipSaveColorBtn" style="padding:12px 28px;">
-              ⚡ Add Color Comparison
-            </button>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+              <button type="button" class="btn btn-outline" id="ipCancelColorEditBtn" style="display:none; padding:12px 20px;" onclick="window.cancelColorGradeEdit()">
+                ✕ Cancel Edit
+              </button>
+              <button type="submit" class="btn btn-primary" id="ipSaveColorBtn" style="padding:12px 28px;">
+                ⚡ Add Color Comparison
+              </button>
+            </div>
           </form>
         </div>
 

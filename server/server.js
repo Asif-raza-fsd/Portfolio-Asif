@@ -59,7 +59,16 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Disable caching on all API responses so updates are instant
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 // API Routes
+app.use('/api', (req, res, next) => next()); // pass-through
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/color-grades', colorGradeRoutes);
