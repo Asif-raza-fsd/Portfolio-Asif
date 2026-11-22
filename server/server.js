@@ -38,8 +38,9 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Body parsing with 50MB limit to handle high-res color grading images, RAW frame grabs, & video thumbnails
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve uploaded assets
 const uploadsDir = path.join(__dirname, 'uploads');

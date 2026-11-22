@@ -1154,6 +1154,41 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      9. DIRECT FILE UPLOADS (PHOTOS & VIDEOS)
      ========================================================================== */
+  // Helper: Client-side image optimizer to keep memory and transfer snappy
+  function optimizeImage(file, maxDimension = 1920, quality = 0.85) {
+    return new Promise((resolve) => {
+      if (!file.type || !file.type.startsWith('image/')) {
+        return resolve(null);
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+
   window.handleFileUpload = async function (inputEl, targetInputId, progressElId = null, previewElId = null) {
     const file = inputEl.files[0];
     if (!file) return;
@@ -1164,32 +1199,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (progressEl) {
       progressEl.style.display = 'block';
-      progressEl.textContent = `Reading ${file.name}...`;
+      progressEl.textContent = `Processing ${file.name}...`;
     }
 
-    // 1. Instant client-side FileReader for images (Base64 data URL fallback)
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target.result;
+    // 1. Instant client-side optimized preview & fallback
+    if (file.type && file.type.startsWith('image/')) {
+      const optimizedDataUrl = await optimizeImage(file);
+      if (optimizedDataUrl) {
         if (targetInput) {
-          targetInput.value = dataUrl;
+          targetInput.value = optimizedDataUrl;
           targetInput.dataset.isAuto = 'false';
         }
         if (previewEl) {
           previewEl.style.display = 'block';
           const img = previewEl.querySelector('img');
-          if (img) img.src = dataUrl;
+          if (img) img.src = optimizedDataUrl;
         }
-        showToast(`✓ Photo "${file.name}" loaded and ready!`);
+        showToast(`✓ Photo "${file.name}" ready!`);
         if (progressEl) {
-          progressEl.textContent = `✓ Photo ready (${(file.size / 1024).toFixed(0)} KB)`;
+          progressEl.textContent = `✓ Photo ready (optimized HD)`;
         }
-      };
-      reader.readAsDataURL(file);
+      }
     }
 
-    // 2. Upload file to server in background
+    // 2. Upload file to server in background to get permanent hosted URL
     const formData = new FormData();
     formData.append('file', file);
 
@@ -1205,8 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.url) {
-          // If server provides a permanent file URL, assign it
-          if (targetInput && (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024)) {
+          if (targetInput) {
             targetInput.value = data.url;
             targetInput.dataset.isAuto = 'false';
           }
@@ -1216,8 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     } catch (err) {
-      console.warn('Server upload notice (client fallback active):', err);
-      // For images, FileReader already populated targetInput so save will succeed anyway!
+      console.warn('Server upload notice (optimized fallback active):', err);
     }
   };
 
