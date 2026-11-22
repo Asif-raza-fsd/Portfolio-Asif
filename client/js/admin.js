@@ -614,7 +614,59 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   /* ==========================================================================
-     9. MODAL UTILITIES
+     9. DIRECT FILE UPLOADS (PHOTOS & VIDEOS)
+     ========================================================================== */
+  window.handleFileUpload = async function (inputEl, targetInputId, progressElId = null, previewElId = null) {
+    const file = inputEl.files[0];
+    if (!file) return;
+
+    const targetInput = document.getElementById(targetInputId);
+    const progressEl = progressElId ? document.getElementById(progressElId) : null;
+    const previewEl = previewElId ? document.getElementById(previewElId) : null;
+
+    if (progressEl) {
+      progressEl.style.display = 'block';
+      progressEl.textContent = `Uploading ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      showToast(`Uploading ${file.name}... Please wait.`);
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${state.token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success && data.url) {
+        if (targetInput) targetInput.value = data.url;
+        showToast(`Uploaded ${file.name} successfully!`);
+        if (progressEl) {
+          progressEl.textContent = `✓ Uploaded: ${data.url}`;
+        }
+        if (previewEl) {
+          previewEl.style.display = 'block';
+          const img = previewEl.querySelector('img');
+          if (img) img.src = data.url;
+        }
+      } else {
+        showToast(data.message || 'Upload failed', 'error');
+        if (progressEl) progressEl.textContent = 'Upload failed.';
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      showToast('Failed to upload file. Check server connection.', 'error');
+      if (progressEl) progressEl.textContent = 'Upload error.';
+    }
+  };
+
+  /* ==========================================================================
+     10. MODAL UTILITIES
      ========================================================================== */
   window.closeModals = function () {
     if (projectModal) projectModal.classList.remove('active');

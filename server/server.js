@@ -11,6 +11,7 @@ const projectRoutes = require('./routes/projects');
 const colorGradeRoutes = require('./routes/colorGrades');
 const settingsRoutes = require('./routes/settings');
 const inquiryRoutes = require('./routes/inquiries');
+const uploadRoutes = require('./routes/upload');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,25 +23,12 @@ app.use(
   })
 );
 
-// Dynamic CORS configuration
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map((url) => url.trim())
-  : ['http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:5000', 'http://localhost:8080'];
-
+// CORS configuration (Permissive for localhost, file://, and Netlify)
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow requests with no origin (like mobile apps, curl, or Postman)
-      if (!origin) return callback(null, true);
-      if (
-        allowedOrigins.includes(origin) ||
-        origin.endsWith('.netlify.app') ||
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1')
-      ) {
-        return callback(null, true);
-      }
-      return callback(null, true); // Permissive in dev/staging to avoid CORS frustration
+      // Always allow requests with no origin, null (file://), localhost, or any domain
+      callback(null, true);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -77,6 +65,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/color-grades', colorGradeRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/inquiries', inquiryRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // API Documentation / root directory
 app.get('/api', (req, res) => {

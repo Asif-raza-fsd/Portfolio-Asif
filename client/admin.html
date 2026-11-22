@@ -233,12 +233,27 @@
           <h3 class="form-sub-heading">Media Assets & Resumes</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label class="form-label">Hero Cutout Portrait URL</label>
-              <input type="text" id="settingPortraitUrl" class="form-control" placeholder="assets/images/hero-portrait.svg or https://...">
+              <label class="form-label">Hero Cutout Portrait (Upload Photo OR URL)</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="settingPortraitUrl" class="form-control" placeholder="assets/images/hero-portrait.svg">
+                <label class="btn btn-outline" style="cursor:pointer; padding:8px 14px; font-size:0.82rem; white-space:nowrap;">
+                  <span>📁 Upload Photo</span>
+                  <input type="file" accept="image/*" style="display:none;" onchange="window.handleFileUpload(this, 'settingPortraitUrl', null, 'settingPortraitPreview')">
+                </label>
+              </div>
+              <div id="settingPortraitPreview" style="margin-top:8px; display:none;">
+                <img src="" style="width:80px; height:95px; object-fit:contain; background:#222; border-radius:6px; border:1px solid var(--accent-orange); padding:4px;">
+              </div>
             </div>
             <div class="form-group">
-              <label class="form-label">CV / Resume PDF URL</label>
-              <input type="text" id="settingCvUrl" class="form-control" placeholder="assets/docs/asif-raza-resume.pdf">
+              <label class="form-label">CV / Resume (Upload PDF OR URL)</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="settingCvUrl" class="form-control" placeholder="assets/docs/asif-raza-resume.pdf">
+                <label class="btn btn-outline" style="cursor:pointer; padding:8px 14px; font-size:0.82rem; white-space:nowrap;">
+                  <span>📁 Upload PDF</span>
+                  <input type="file" accept="application/pdf" style="display:none;" onchange="window.handleFileUpload(this, 'settingCvUrl')">
+                </label>
+              </div>
             </div>
           </div>
 
@@ -338,13 +353,29 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Video Embed / URL *</label>
-          <input type="text" id="projVideoUrl" class="form-control" required placeholder="https://www.youtube.com/watch?v=... or MP4 URL">
+          <label class="form-label">Video Source (Upload Video File OR Paste YouTube/Vimeo Link) *</label>
+          <div style="display:flex; gap:10px; margin-bottom:6px;">
+            <input type="text" id="projVideoUrl" class="form-control" required placeholder="https://www.youtube.com/watch?v=... or MP4 file">
+            <label class="btn btn-outline" style="cursor:pointer; white-space:nowrap; padding:10px 16px; font-size:0.85rem;">
+              <span>📁 Upload MP4</span>
+              <input type="file" id="projVideoFileInput" accept="video/mp4,video/webm,video/quicktime" style="display:none;" onchange="window.handleFileUpload(this, 'projVideoUrl', 'videoProgress')">
+            </label>
+          </div>
+          <div id="videoProgress" style="display:none; font-size:0.8rem; color:var(--accent-orange); margin-top:4px;"></div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Thumbnail Image URL *</label>
-          <input type="text" id="projThumbUrl" class="form-control" required placeholder="assets/images/thumb-1.jpg or https://...">
+          <label class="form-label">Thumbnail Image (Upload Photo OR Paste Image URL) *</label>
+          <div style="display:flex; gap:10px; margin-bottom:6px;">
+            <input type="text" id="projThumbUrl" class="form-control" required placeholder="assets/images/thumb-1.jpg or https://...">
+            <label class="btn btn-outline" style="cursor:pointer; white-space:nowrap; padding:10px 16px; font-size:0.85rem;">
+              <span>📁 Upload Photo</span>
+              <input type="file" id="projThumbFileInput" accept="image/*" style="display:none;" onchange="window.handleFileUpload(this, 'projThumbUrl', null, 'projThumbPreview')">
+            </label>
+          </div>
+          <div id="projThumbPreview" style="margin-top:8px; display:none;">
+            <img src="" style="width:120px; height:75px; object-fit:cover; border-radius:6px; border:1px solid var(--accent-orange);">
+          </div>
         </div>
 
         <div class="form-group">
@@ -388,12 +419,30 @@
 
         <div class="form-row-2">
           <div class="form-group">
-            <label class="form-label">Before Image URL (RAW / LOG) *</label>
-            <input type="text" id="colorBeforeUrl" class="form-control" required placeholder="assets/images/before-grade-1.jpg">
+            <label class="form-label">Before Image (RAW / LOG) *</label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="colorBeforeUrl" class="form-control" required placeholder="assets/images/before-grade-1.jpg">
+              <label class="btn btn-outline" style="cursor:pointer; padding:8px 12px; font-size:0.8rem; white-space:nowrap;">
+                <span>📁 Upload</span>
+                <input type="file" accept="image/*" style="display:none;" onchange="window.handleFileUpload(this, 'colorBeforeUrl', null, 'colorBeforePreview')">
+              </label>
+            </div>
+            <div id="colorBeforePreview" style="margin-top:6px; display:none;">
+              <img src="" style="width:100px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--border-subtle);">
+            </div>
           </div>
           <div class="form-group">
-            <label class="form-label">After Image URL (Graded Look) *</label>
-            <input type="text" id="colorAfterUrl" class="form-control" required placeholder="assets/images/after-grade-1.jpg">
+            <label class="form-label">After Image (Graded Look) *</label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="colorAfterUrl" class="form-control" required placeholder="assets/images/after-grade-1.jpg">
+              <label class="btn btn-outline" style="cursor:pointer; padding:8px 12px; font-size:0.8rem; white-space:nowrap;">
+                <span>📁 Upload</span>
+                <input type="file" accept="image/*" style="display:none;" onchange="window.handleFileUpload(this, 'colorAfterUrl', null, 'colorAfterPreview')">
+              </label>
+            </div>
+            <div id="colorAfterPreview" style="margin-top:6px; display:none;">
+              <img src="" style="width:100px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--accent-orange);">
+            </div>
           </div>
         </div>
 
