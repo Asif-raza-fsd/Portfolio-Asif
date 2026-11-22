@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const authMiddleware = require('../middleware/auth');
 
-const UPLOADS_DIR = path.join(__dirname, '../../client/assets/uploads');
+const UPLOADS_DIR = path.join(__dirname, '../uploads');
 
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
@@ -62,12 +62,26 @@ router.post('/', authMiddleware, upload.single('file'), (req, res) => {
       });
     }
 
-    const relativeUrl = `assets/uploads/${req.file.filename}`;
+    const host = req.get('host') || 'localhost:5050';
+    const isHttps = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' || host.includes('onrender.com');
+    const fullUrl = `${isHttps ? 'https' : 'http'}://${host}/uploads/${req.file.filename}`;
+
+    let dataUrl = null;
+    if (req.file.mimetype.startsWith('image/') && req.file.size <= 10 * 1024 * 1024) {
+      try {
+        const fileBuf = fs.readFileSync(req.file.path);
+        dataUrl = `data:${req.file.mimetype};base64,${fileBuf.toString('base64')}`;
+      } catch (e) {
+        console.warn('Could not generate dataUrl:', e);
+      }
+    }
 
     res.json({
       success: true,
       message: 'File uploaded successfully!',
-      url: relativeUrl,
+      url: dataUrl || fullUrl,
+      fileUrl: fullUrl,
+      dataUrl: dataUrl,
       filename: req.file.filename,
       originalName: req.file.originalname,
       size: req.file.size,

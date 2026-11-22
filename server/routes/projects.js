@@ -32,15 +32,36 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+function getAutoThumbnail(videoUrl, category = 'reels') {
+  if (!videoUrl) return 'assets/images/thumb-1.jpg';
+  const ytMatch = String(videoUrl).match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    return `https://img.youtube.com/vi/${ytMatch[1]}/maxresdefault.jpg`;
+  }
+  const vimeoMatch = String(videoUrl).match(/vimeo\.com\/(?:video\/)?([0-9]+)/i);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return `https://vumbnail.com/${vimeoMatch[1]}.jpg`;
+  }
+  const cat = String(category || '').toLowerCase();
+  if (cat.includes('reel') || cat.includes('short')) return 'assets/images/thumb-1.jpg';
+  if (cat.includes('color')) return 'assets/images/thumb-2.jpg';
+  if (cat.includes('commercial') || cat.includes('youtube')) return 'assets/images/thumb-3.jpg';
+  return 'assets/images/thumb-4.jpg';
+}
+
 // POST /api/projects - Protected
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { title, category, description, videoUrl, thumbnailUrl, clientMetric, featured, tags, order } = req.body;
-    if (!title || !videoUrl || !thumbnailUrl) {
+    let { title, category, description, videoUrl, thumbnailUrl, clientMetric, featured, tags, order } = req.body;
+    if (!title || !videoUrl) {
       return res.status(400).json({
         success: false,
-        message: 'Title, Video URL, and Thumbnail URL are required fields.',
+        message: 'Title and Video URL are required fields.',
       });
+    }
+
+    if (!thumbnailUrl || !thumbnailUrl.trim()) {
+      thumbnailUrl = getAutoThumbnail(videoUrl, category);
     }
 
     const newProject = await dataStore.createProject({
@@ -69,6 +90,9 @@ router.post('/', authMiddleware, async (req, res) => {
 // PUT /api/projects/:id - Protected
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
+    if (req.body.videoUrl && (!req.body.thumbnailUrl || !req.body.thumbnailUrl.trim())) {
+      req.body.thumbnailUrl = getAutoThumbnail(req.body.videoUrl, req.body.category);
+    }
     const updated = await dataStore.updateProject(req.params.id, req.body);
     if (!updated) {
       return res.status(404).json({ success: false, message: 'Project not found' });

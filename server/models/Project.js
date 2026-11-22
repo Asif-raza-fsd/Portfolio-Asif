@@ -25,7 +25,7 @@ const projectSchema = new mongoose.Schema(
     },
     thumbnailUrl: {
       type: String,
-      required: [true, 'Thumbnail image URL is required'],
+      default: '',
       trim: true,
     },
     clientMetric: {

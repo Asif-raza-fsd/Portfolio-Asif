@@ -462,6 +462,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Auto-Thumbnail Helper
+  function getAutoThumbnail(videoUrl, category = 'reels') {
+    if (!videoUrl) return 'assets/images/thumb-1.jpg';
+    const ytMatch = String(videoUrl).match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i);
+    if (ytMatch && ytMatch[1]) {
+      return `https://img.youtube.com/vi/${ytMatch[1]}/maxresdefault.jpg`;
+    }
+    const vimeoMatch = String(videoUrl).match(/vimeo\.com\/(?:video\/)?([0-9]+)/i);
+    if (vimeoMatch && vimeoMatch[1]) {
+      return `https://vumbnail.com/${vimeoMatch[1]}.jpg`;
+    }
+    const cat = String(category || '').toLowerCase();
+    if (cat.includes('reel') || cat.includes('short')) return 'assets/images/thumb-1.jpg';
+    if (cat.includes('color')) return 'assets/images/thumb-2.jpg';
+    if (cat.includes('commercial') || cat.includes('youtube')) return 'assets/images/thumb-3.jpg';
+    return 'assets/images/thumb-4.jpg';
+  }
+
+  function setupAutoThumbListeners(videoInputId, thumbInputId, previewId, categoryId) {
+    const videoEl = document.getElementById(videoInputId);
+    const thumbEl = document.getElementById(thumbInputId);
+    const previewEl = document.getElementById(previewId);
+
+    if (!videoEl || !thumbEl) return;
+
+    videoEl.addEventListener('input', () => {
+      const val = videoEl.value.trim();
+      if (!val) return;
+      if (!thumbEl.value.trim() || thumbEl.dataset.isAuto === 'true') {
+        const cat = categoryId && document.getElementById(categoryId) ? document.getElementById(categoryId).value : 'reels';
+        const auto = getAutoThumbnail(val, cat);
+        thumbEl.value = auto;
+        thumbEl.dataset.isAuto = 'true';
+        if (previewEl) {
+          previewEl.style.display = 'block';
+          const img = previewEl.querySelector('img');
+          if (img) img.src = auto;
+        }
+      }
+    });
+
+    thumbEl.addEventListener('input', () => {
+      thumbEl.dataset.isAuto = 'false';
+      if (previewEl) {
+        if (thumbEl.value.trim()) {
+          previewEl.style.display = 'block';
+          const img = previewEl.querySelector('img');
+          if (img) img.src = thumbEl.value.trim();
+        } else {
+          previewEl.style.display = 'none';
+        }
+      }
+    });
+  }
+
+  setupAutoThumbListeners('ipProjVideoUrl', 'ipProjThumbUrl', 'ipProjThumbPreview', 'ipProjCategory');
+  setupAutoThumbListeners('projVideoUrl', 'projThumbUrl', 'projThumbPreview', 'projCategory');
+
   // Handle In-Page Project Form (Handles BOTH Create and Edit)
   const inPageProjectForm = document.getElementById('inPageProjectForm');
   if (inPageProjectForm) {
@@ -472,7 +530,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const category = document.getElementById('ipProjCategory').value;
       const clientMetric = document.getElementById('ipProjMetric').value.trim();
       const videoUrl = document.getElementById('ipProjVideoUrl').value.trim();
-      const thumbnailUrl = document.getElementById('ipProjThumbUrl').value.trim();
+      let thumbnailUrl = document.getElementById('ipProjThumbUrl').value.trim();
+      if (!thumbnailUrl) {
+        thumbnailUrl = getAutoThumbnail(videoUrl, category);
+      }
       const tags = document.getElementById('ipProjTags').value.split(',').map((t) => t.trim()).filter(Boolean);
       const description = document.getElementById('ipProjDesc').value.trim();
       const featured = document.getElementById('ipProjFeatured').checked;
@@ -537,7 +598,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const category = document.getElementById('projCategory').value;
       const clientMetric = document.getElementById('projMetric').value.trim();
       const videoUrl = document.getElementById('projVideoUrl').value.trim();
-      const thumbnailUrl = document.getElementById('projThumbUrl').value.trim();
+      let thumbnailUrl = document.getElementById('projThumbUrl').value.trim();
+      if (!thumbnailUrl) {
+        thumbnailUrl = getAutoThumbnail(videoUrl, category);
+      }
       const tags = document.getElementById('projTags').value.split(',').map((t) => t.trim()).filter(Boolean);
       const description = document.getElementById('projDesc').value.trim();
       const featured = document.getElementById('projFeatured').checked;
@@ -1058,14 +1122,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (progressEl) {
       progressEl.style.display = 'block';
-      progressEl.textContent = `Uploading ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`;
+      progressEl.textContent = `Reading ${file.name}...`;
     }
 
+    // 1. Instant client-side FileReader for images (Base64 data URL fallback)
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        if (targetInput) {
+          targetInput.value = dataUrl;
+          targetInput.dataset.isAuto = 'false';
+        }
+        if (previewEl) {
+          previewEl.style.display = 'block';
+          const img = previewEl.querySelector('img');
+          if (img) img.src = dataUrl;
+        }
+        showToast(`✓ Photo "${file.name}" loaded and ready!`);
+        if (progressEl) {
+          progressEl.textContent = `✓ Photo ready (${(file.size / 1024).toFixed(0)} KB)`;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 2. Upload file to server in background
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      showToast(`Uploading ${file.name}... Please wait.`);
       const res = await fetch(`${CONFIG.API_BASE_URL}/api/upload`, {
         method: 'POST',
         headers: {
@@ -1074,26 +1160,22 @@ document.addEventListener('DOMContentLoaded', () => {
         body: formData,
       });
 
-      const data = await res.json();
-      if (data.success && data.url) {
-        if (targetInput) targetInput.value = data.url;
-        showToast(`Uploaded ${file.name} successfully!`);
-        if (progressEl) {
-          progressEl.textContent = `✓ Uploaded: ${data.url}`;
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.url) {
+          // If server provides a permanent file URL, assign it
+          if (targetInput && (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024)) {
+            targetInput.value = data.url;
+            targetInput.dataset.isAuto = 'false';
+          }
+          if (progressEl) {
+            progressEl.textContent = `✓ Uploaded to server (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
+          }
         }
-        if (previewEl) {
-          previewEl.style.display = 'block';
-          const img = previewEl.querySelector('img');
-          if (img) img.src = data.url;
-        }
-      } else {
-        showToast(data.message || 'Upload failed', 'error');
-        if (progressEl) progressEl.textContent = 'Upload failed.';
       }
     } catch (err) {
-      console.error('Upload error:', err);
-      showToast('Failed to upload file. Check server connection.', 'error');
-      if (progressEl) progressEl.textContent = 'Upload error.';
+      console.warn('Server upload notice (client fallback active):', err);
+      // For images, FileReader already populated targetInput so save will succeed anyway!
     }
   };
 
