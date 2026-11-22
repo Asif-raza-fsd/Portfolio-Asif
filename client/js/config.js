@@ -2,10 +2,10 @@
  * Centralized API configuration for Asif Raza Portfolio
  * Automatically switches between local development server and production Render backend.
  */
+const PRODUCTION_API_URL = 'https://portfolio-asif.onrender.com';
+
 const CONFIG = {
-  // SET YOUR DEPLOYED RENDER BACKEND URL HERE:
-  // e.g., 'https://asif-raza-portfolio-api.onrender.com'
-  PRODUCTION_API_URL: 'https://portfolio-asif.onrender.com',
+  PRODUCTION_API_URL,
 
   API_BASE_URL: (() => {
     // 1. Allow manual override via ?api=... query parameter, window variable, or localStorage
@@ -28,7 +28,7 @@ const CONFIG = {
     }
 
     // 3. Production on Netlify / Custom Domain: Point to live Render backend
-    return 'https://asif-raza-portfolio-api.onrender.com';
+    return PRODUCTION_API_URL;
   })(),
 
   DEFAULT_STATS: {
