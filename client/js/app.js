@@ -13,7 +13,34 @@ document.addEventListener('DOMContentLoaded', () => {
     activeComparisonIndex: 0,
   };
 
-  // Pre-warm Render backend on initial site visit so API is hot
+  const COLOR_GRADES_CACHE_KEY = 'asif_cached_color_grades_v2';
+  const initialData = window.INITIAL_PORTFOLIO_DATA || {};
+
+  // 1. Instant Settings Bootstrapping (0ms)
+  try {
+    const cachedSettings = localStorage.getItem('asif_cached_settings');
+    state.settings = cachedSettings ? JSON.parse(cachedSettings) : (initialData.settings || null);
+  } catch (e) {
+    state.settings = initialData.settings || null;
+  }
+
+  // 2. Instant Projects Bootstrapping (0ms)
+  try {
+    const cachedProjects = localStorage.getItem('asif_cached_projects');
+    state.projects = cachedProjects ? JSON.parse(cachedProjects) : (initialData.projects || []);
+  } catch (e) {
+    state.projects = initialData.projects || [];
+  }
+
+  // 3. Instant Color Grades Bootstrapping (0ms)
+  try {
+    const cachedGrades = localStorage.getItem(COLOR_GRADES_CACHE_KEY);
+    state.colorGrades = cachedGrades ? JSON.parse(cachedGrades) : (initialData.grades || []);
+  } catch (e) {
+    state.colorGrades = initialData.grades || [];
+  }
+
+  // Pre-warm Render backend in the background so API is ready
   try {
     fetch(`${CONFIG.API_BASE_URL}/api/health`, { mode: 'cors' }).catch(() => {});
   } catch (e) {}
@@ -71,6 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const inquiryForm = document.getElementById('inquiryForm');
   const submitInquiryBtn = document.getElementById('submitInquiryBtn');
   const toastContainer = document.getElementById('toastContainer');
+
+  // Immediate Initial Render from pre-bundled data / cache (0ms Perception!)
+  renderSettings(state.settings || CONFIG.DEFAULT_STATS);
+  if (state.projects && state.projects.length > 0) {
+    renderProjects();
+  }
+  if (state.colorGrades && state.colorGrades.length > 0) {
+    renderAllColorGrades();
+  }
 
   /* ==========================================================================
      1. TOAST NOTIFICATIONS
@@ -149,15 +185,19 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadSettings() {
     try {
       const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings?_t=${Date.now()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.success && data.data) {
-        state.settings = data.data;
-        renderSettings(data.data);
+        const newJson = JSON.stringify(data.data);
+        const oldJson = JSON.stringify(state.settings || {});
+        if (newJson !== oldJson) {
+          state.settings = data.data;
+          renderSettings(data.data);
+          try { localStorage.setItem('asif_cached_settings', newJson); } catch (e) {}
+        }
       }
     } catch (err) {
-      console.warn('Backend unavailable, using default settings:', err);
-      // Use fallback defaults
-      renderSettings(CONFIG.DEFAULT_STATS);
+      console.warn('Backend sync pending for settings:', err.message);
     }
   }
 
@@ -200,18 +240,30 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadProjects() {
     try {
       const res = await fetch(`${CONFIG.API_BASE_URL}/api/projects?_t=${Date.now()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if (data.success && Array.isArray(data.data)) {
-        state.projects = data.data;
-        renderProjects();
+      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+        const newJson = JSON.stringify(data.data);
+        const oldJson = JSON.stringify(state.projects || []);
+        if (newJson !== oldJson) {
+          state.projects = data.data;
+          renderProjects();
+          try { localStorage.setItem('asif_cached_projects', newJson); } catch (e) {}
+        }
       }
     } catch (err) {
-      console.error('Failed to load projects:', err);
-      projectsGrid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-secondary);">
-          Unable to connect to the backend server. Please make sure the server is running on ${CONFIG.API_BASE_URL}.
-        </div>
-      `;
+      console.warn('Backend sync pending for projects:', err.message);
+      // Only display message if we have literally nothing in memory to show
+      if (!state.projects || state.projects.length === 0) {
+        projectsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-secondary);">
+            <p style="margin-bottom: 12px;">Connecting to portfolio projects...</p>
+            <button onclick="window.retryLoadAll()" class="btn-primary" style="padding: 8px 20px; font-size: 0.85rem;">
+              ↻ Refresh Projects
+            </button>
+          </div>
+        `;
+      }
     }
   }
 
@@ -378,8 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      6. BEFORE & AFTER COLOR GRADING SHOWCASE (Downwise for All Looks)
      ========================================================================== */
-  const COLOR_GRADES_CACHE_KEY = 'asif_cached_color_grades_v2';
-
   function renderColorGradesSkeleton() {
     const listEl = document.getElementById('colorGradesList');
     if (!listEl) return;
@@ -407,26 +457,12 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadColorGrades() {
     const listEl = document.getElementById('colorGradesList');
 
-    // 1. Instant Cache Render (0ms Perception!)
-    try {
-      const cached = localStorage.getItem(COLOR_GRADES_CACHE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          state.colorGrades = parsed;
-          renderAllColorGrades();
-        }
-      }
-    } catch (e) {
-      console.warn('Cache read notice:', e);
-    }
-
-    // 2. If nothing rendered yet, display skeleton placeholder
+    // 1. If nothing rendered yet, display skeleton placeholder
     if (!state.colorGrades || state.colorGrades.length === 0) {
       renderColorGradesSkeleton();
     }
 
-    // 3. Background fetch from server
+    // 2. Background fetch from server
     try {
       const res = await fetch(`${CONFIG.API_BASE_URL}/api/color-grades?_t=${Date.now()}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -445,14 +481,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     } catch (err) {
-      console.warn('Could not fetch color grades from server:', err);
+      console.warn('Backend sync pending for color grades:', err.message);
       if (!state.colorGrades || state.colorGrades.length === 0) {
         if (listEl) {
           listEl.innerHTML = `
             <div style="text-align:center; padding:40px 20px; color:var(--text-secondary); background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed var(--border-color);">
-              <p style="margin-bottom:12px;">Could not connect to color grade showcase.</p>
-              <button onclick="window.retryLoadColorGrades()" class="btn-primary" style="padding:8px 20px; font-size:0.85rem;">
-                ↻ Retry Loading
+              <p style="margin-bottom:12px;">Connecting to color grade showcase...</p>
+              <button onclick="window.retryLoadAll()" class="btn-primary" style="padding:8px 20px; font-size:0.85rem;">
+                ↻ Refresh Looks
               </button>
             </div>
           `;
@@ -462,7 +498,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.retryLoadColorGrades = function () {
-    renderColorGradesSkeleton();
     loadColorGrades();
   };
 
@@ -683,8 +718,28 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/'/g, '&#039;');
   }
 
-  // Initial App Bootstrapping
+  // Background Server Synchronization & Cold-Start Keepalive
   loadSettings();
   loadProjects();
   loadColorGrades();
+
+  // Retry background sync if backend was waking up from cold sleep
+  let syncAttempts = 0;
+  function scheduleBackgroundSync() {
+    if (syncAttempts < 3) {
+      syncAttempts++;
+      setTimeout(() => {
+        loadSettings();
+        loadProjects();
+        loadColorGrades();
+      }, 7000 * syncAttempts);
+    }
+  }
+  scheduleBackgroundSync();
+
+  window.retryLoadAll = function () {
+    loadSettings();
+    loadProjects();
+    loadColorGrades();
+  };
 });
