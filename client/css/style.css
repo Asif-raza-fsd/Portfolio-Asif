@@ -1346,6 +1346,92 @@ img, svg {
   font-weight: 600;
 }
 
+/* Cal.com Meeting Booking Box */
+.meeting-booking-box {
+  background: linear-gradient(135deg, rgba(229, 181, 116, 0.09) 0%, rgba(20, 21, 25, 0.95) 100%);
+  border: 1px solid rgba(229, 181, 116, 0.35);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.meeting-booking-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent-gradient);
+}
+
+.meeting-booking-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.meeting-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: rgba(229, 181, 116, 0.15);
+  border: 1px solid rgba(229, 181, 116, 0.4);
+  color: var(--accent-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.meeting-icon-wrap svg {
+  width: 20px;
+  height: 20px;
+}
+
+.meeting-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.meeting-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.btn-meeting-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--accent-gradient);
+  color: #0A0B0E !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 16px rgba(229, 181, 116, 0.25);
+  width: 100%;
+  text-decoration: none;
+}
+
+.btn-meeting-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(229, 181, 116, 0.45);
+  color: #0A0B0E !important;
+}
+
 /* Contact Form */
 .contact-form-wrap {
   background: var(--bg-card);
@@ -1925,6 +2011,20 @@ textarea.form-control {
   }
 
   /* Contact Form on Mobile */
+  .meeting-booking-box {
+    padding: 16px 14px;
+    gap: 12px;
+  }
+  .meeting-title {
+    font-size: 0.98rem;
+  }
+  .meeting-subtitle {
+    font-size: 0.8rem;
+  }
+  .btn-meeting-link {
+    font-size: 0.88rem;
+    padding: 11px 16px;
+  }
   .contact-form-wrap {
     padding: 22px 16px;
     border-radius: var(--radius-md);
